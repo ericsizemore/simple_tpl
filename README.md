@@ -83,7 +83,7 @@ $tpl->display('../src/example.tpl');
 
 ### Requirements
 
-- Simplte Template Engine works with PHP 7.0.0 or above.
+- Simple Template Engine works with PHP 7.0.0 or above.
 
 ### Submitting bugs and feature requests
 
@@ -100,8 +100,8 @@ Simple Template Engine accepts contributions of code and documentation from the 
 These contributions can be made in the form of Issues or [Pull Requests](http://help.github.com/send-pull-requests/) 
 on the [Simple Template Engine repository](https://github.com/ericsizemore/simple_tpl).
 
-Simple Template Engine is licensed under the MIT license. When submitting new features or patches to Simple Template Engine, you are 
-giving permission to license those features or patches under the MIT license.
+Simple Template Engine is licensed under the GNU GPL v3 license. When submitting new features or patches to Simple Template Engine, you are 
+giving permission to license those features or patches under the GNU GPL v3 license.
 
 #### Guidelines
 
