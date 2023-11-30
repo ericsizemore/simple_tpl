@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Simple Template Engine
  *
  * @author    Eric Sizemore <admin@secondversion.com>
  * @package   Simple Template Engine
  * @link      http://www.secondversion.com/
- * @version   1.0.5
- * @copyright (C) 2006-2019 Eric Sizemore
+ * @version   2.0.0
+ * @copyright (C) 2006-2023 Eric Sizemore
  * @license   https://www.gnu.org/licenses/gpl-3.0.en.html GNU Public License
  *
  *    This program is free software: you can redistribute it and/or modify
@@ -21,12 +23,22 @@
  *    GNU General Public License for more details.
  *
  *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *    along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+// Include composer autoload file
+require_once 'vendor/autoload.php';
+use Esi\SimpleTpl\Template;
+
+$tpl = new Template();
+
+/* 
+Or if you aren't using via composer, you can use the
+following code:
 
 // Include class file and instantiate.
 require_once '../src/Template.php';
-$tpl = new \Esi\Template();
+$tpl = new \Esi\SimpleTpl\Template();
+*/
 
 // Set custom delimiters:
 $tpl->setLeftDelimiter('{%');
@@ -41,10 +53,10 @@ $tpl->setRightDelimiter('%}');
 */
 $tpl->assign([
     'title'   => 'Simple Template Engine Test',
-    'content' => 'This is a test of the <a href="http://www.phpclasses.org/browse/package/3171.html">Simple Template Engine</a> class by Eric Sizemore.'
+    'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
 ]);
 
 // Parse the template file
-$tpl->display('../src/example.tpl');
+$tpl->display('exampleCustomDelimiter.tpl');
 
 // It's that simple, really.

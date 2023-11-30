@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * Simple Template Engine
  *
  * @author    Eric Sizemore <admin@secondversion.com>
  * @package   Simple Template Engine
  * @link      http://www.secondversion.com/
- * @version   1.0.5
- * @copyright (C) 2006-2019 Eric Sizemore
+ * @version   2.0.0
+ * @copyright (C) 2006-2023 Eric Sizemore
  * @license   https://www.gnu.org/licenses/gpl-3.0.en.html GNU Public License
  *
  *    This program is free software: you can redistribute it and/or modify
@@ -21,9 +23,9 @@
  *    GNU General Public License for more details.
  *
  *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *    along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Esi;
+namespace Esi\SimpleTpl;
 
 /**
  * Pretty simple template engine. Performs simple search and replace on defined
@@ -34,24 +36,24 @@ class Template
     /**
      * Template variables and their replacements
      *
-     * @var  array
+     * @var  array<mixed>
      */
-    private $tplVars;
+    private array $tplVars = [];
 
     /**
      * Delimiters to use when search for the variables to replace.
      *
      * @var  string
      */
-    private $leftDelimiter = '{';
-    private $rightDelimiter = '}';
+    private string $leftDelimiter = '{';
+    private string $rightDelimiter = '}';
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->tplVars = [];
+        //
     }
 
     /**
@@ -59,9 +61,9 @@ class Template
      *
      * @param  string  $delimiter
      */
-    public function setLeftDelimiter(string $delimiter)
+    public function setLeftDelimiter(string $delimiter): void
     {
-        $this->leftDelimiter = $delimiter ?: '{';
+        $this->leftDelimiter = $delimiter;
     }
 
     /**
@@ -79,9 +81,9 @@ class Template
      *
      * @param  string  $delimiter
      */
-    public function setRightDelimiter(string $delimiter)
+    public function setRightDelimiter(string $delimiter): void
     {
-        $this->rightDelimiter = $delimiter ?: '}';
+        $this->rightDelimiter = $delimiter;
     }
 
     /**
@@ -89,19 +91,29 @@ class Template
      *
      * @return  string
      */
-    public function getRightDelimiter()
+    public function getRightDelimiter(): string
     {
         return $this->rightDelimiter;
     }
 
     /**
+     * Return the currently assigned variables.
+     *
+     * @return array<mixed>
+     */
+    public function toArray(): array
+    {
+        return $this->tplVars;
+    }
+
+    /**
      * Assign our variables and replacements
      *
-     * @param  array  $tplVars  Template variables and replacements
+     * @param  array<mixed>  $tplVars  Template variables and replacements
      */
-    public function assign(array $tplVars)
+    public function assign(array $tplVars): void
     {
-        $this->tplVars = array_merge($this->tplVars, $tplVars);
+        $this->tplVars = \array_merge($this->tplVars, $tplVars);
     }
 
     /**
@@ -111,7 +123,7 @@ class Template
      *
      * @param  string  $tplFile  Template file
      */
-    public function display(string $tplFile)
+    public function display(string $tplFile): void
     {
         echo $this->parse($tplFile);
     }
@@ -128,20 +140,21 @@ class Template
     public function parse(string $tplFile): string
     {
         // Make sure it's a valid file, and it exists
-        if (!is_file($tplFile)) {
+        if (!\is_file($tplFile) OR !\is_readable($tplFile)) {
             throw new \InvalidArgumentException(sprintf('"%s" does not exist or is not a file.', $tplFile));
         }
 
-        $contents = file_get_contents($tplFile);
+        $contents = \file_get_contents($tplFile);
 
-        // Make sure it has content.
-        if (empty($contents)) {
-            throw new \Exception(sprintf('"%s" does not appear to have any valid content.', $tplFile));
+        // Make sure it has content. file_get_contents can return 'false' on error
+        if ($contents === '' OR $contents === false) {
+            throw new \Exception(\sprintf('"%s" does not appear to have any valid content.', $tplFile));
         }
 
-        //
-        foreach ($this->tplVars as $find => $replace) {
-            $contents = str_replace(sprintf(
+        // Process replacements
+		/** @var string $replace **/
+        foreach ($this->tplVars AS $find => $replace) {
+            $contents = \str_replace(\sprintf(
                 '%s%s%s',
                 $this->leftDelimiter,
                 $find,

@@ -5,6 +5,26 @@ template parsing engine that works on text replacement.
 
 ## Installation
 
+### Composer
+
+```bash
+$ composer require esi/simple_tpl
+```
+
+Then, within your project (if not already included), include composer's autoload. For example:
+
+```php
+<?php
+
+require_once 'vendor/autoload.php';
+use Esi\SimpleTpl\Template;
+
+$tpl = new Template();
+
+?>
+```
+
+### Manual
 Simply drop `Template.php` in any project and call `include 'src/Template.php';`, where 
 `'src/'` is the path to where you placed the template engine file(s).
 
@@ -13,26 +33,19 @@ For example:
 ```php
 <?php
 
-include 'src/simple_tpl/Template.php';
+include 'src/Template.php';
+use Esi\SimpleTpl\Template;
 
+$tpl = new Template();
 ?>
 ```
 
-## Basic Usage
+### Examples/Usage
 
-```php
-<?php
-
-include 'src/simple_tpl/Template.php';
-
-$tpl = new \Esi\Template();
-
-?>
-```
+Refer to the `/examples/` folder for more information and examples.
 
 There are three main methods of the Template class that are used to parse and display a template. An example is provided with the `'examples'` directory. 
-Those methods are `'assign()'`, `'parse()'` and `'display()'`. The `'display()'` method is a wrapper for '`parse()`' with the only difference being that `'display()'` 
-will echo the contents of the template instead of returning them as a string.
+Those methods are `'assign()'`, `'parse()'` and `'display()'`. The `'display()'` method is a wrapper for '`parse()`' with the only difference being that `'display()'` will echo the contents of the template instead of returning them as a string.
 
 ## A Simple Example
 
@@ -40,9 +53,10 @@ will echo the contents of the template instead of returning them as a string.
 ```php
 <?php
 
-// Include class file and instantiate.
-require_once '../src/Template.php';
-$tpl = new \Esi\Template();
+require_once 'vendor/autoload.php';
+use Esi\SimpleTpl\Template;
+
+$tpl = new Template();
 
 /**
 * assign expects an array of:
@@ -53,11 +67,11 @@ $tpl = new \Esi\Template();
 */
 $tpl->assign([
     'title'   => 'Simple Template Engine Test',
-    'content' => 'This is a test of the <a href="http://www.phpclasses.org/browse/package/3171.html">Simple Template Engine</a> class by Eric Sizemore.'
+    'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
 ]);
 
 // Parse the template file
-$tpl->display('../src/example.tpl');
+$tpl->display('examples/example.tpl');
 
 ?>
 ```
@@ -83,7 +97,7 @@ $tpl->display('../src/example.tpl');
 
 ### Requirements
 
-- Simple Template Engine works with PHP 7.0.0 or above.
+- Simple Template Engine works with PHP 8.1.0 or above.
 
 ### Submitting bugs and feature requests
 
@@ -136,7 +150,7 @@ branches for both of these features and send two requests.
 
 ### Author
 
-Eric Sizemore - <admin@secondversion.com> - <http://www.secondversion.com>
+Eric Sizemore - <admin@secondversion.com> - <https://www.secondversion.com>
 
 ### License
 
