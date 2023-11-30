@@ -1,5 +1,12 @@
 # Simple Template Engine - Text based template parser.
 
+[![PHPStan](https://github.com/ericsizemore/simple_tpl/actions/workflows/ci.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/ci.yml)
+[![Psalm Security Scan](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml)
+[![Tests](https://github.com/ericsizemore/simple_tpl/actions/workflows/tests.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/tests.yml)
+[![Latest Stable Version](https://img.shields.io/packagist/v/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
+[![Downloads per Month](https://img.shields.io/packagist/dm/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
+[![License](https://img.shields.io/packagist/l/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
+
 [Simple Template Engine](http://github.com/ericsizemore/simple_tpl/) is a small, simple text-based 
 template parsing engine that works on text replacement.
 
