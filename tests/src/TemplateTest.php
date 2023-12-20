@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Simple Template Engine
@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * @author    Eric Sizemore <admin@secondversion.com>
  * @package   Simple Template Engine
  * @link      http://www.secondversion.com/
- * @version   2.0.0
+ * @version   2.0.1
  * @copyright (C) 2006-2023 Eric Sizemore
  * @license   https://www.gnu.org/licenses/gpl-3.0.en.html GNU Public License
  *
@@ -136,7 +136,7 @@ class TemplateTest extends TestCase
     {
         $template = new Template();
 
-        \file_put_contents(self::$testFiles['file1'], <<<HTML
+        \file_put_contents(self::$testFiles['file1'], <<<html
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -150,7 +150,7 @@ class TemplateTest extends TestCase
 
 </body>
 </html>
-HTML);
+html);
 
         $template->assign([
             'title'   => 'Simple Template Engine Test',
@@ -162,7 +162,7 @@ HTML);
         $data = \ob_get_contents();
         \ob_end_clean();
 
-        self::assertEquals(<<<HTML
+        self::assertEquals(<<<html
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -176,7 +176,7 @@ HTML);
 
 </body>
 </html>
-HTML, $data);
+html, $data);
     }
 
     /**
@@ -186,8 +186,10 @@ HTML, $data);
     {
         $template = new Template();
 
+        /** @scrutinizer ignore-call */
         self::expectException(\InvalidArgumentException::class);
-        $data = $template->parse('/this/should/not/exist.tpl');        
+
+        $template->parse('/this/should/not/exist.tpl');        
     }
 
     /**
@@ -199,8 +201,10 @@ HTML, $data);
 
         \file_put_contents(self::$testFiles['file2'], '');
 
+        /** @scrutinizer ignore-call */
         self::expectException(\Exception::class);
-        $data = $template->parse(self::$testFiles['file2']);
+
+        $template->parse(self::$testFiles['file2']);
     }
 
     /**
@@ -210,7 +214,7 @@ HTML, $data);
     {
         $template = new Template();
 
-        \file_put_contents(self::$testFiles['file1'], <<<HTML
+        \file_put_contents(self::$testFiles['file1'], <<<html
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -224,7 +228,7 @@ HTML, $data);
 
 </body>
 </html>
-HTML);
+html);
 
         $template->assign([
             'title'   => 'Simple Template Engine Test',
@@ -233,7 +237,7 @@ HTML);
 
         $data = $template->parse(self::$testFiles['file1']);
 
-        self::assertEquals(<<<HTML
+        self::assertEquals(<<<html
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -247,7 +251,7 @@ HTML);
 
 </body>
 </html>
-HTML, $data);
+html, $data);
 
     }
 }

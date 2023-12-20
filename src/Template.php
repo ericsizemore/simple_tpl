@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Simple Template Engine
@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * @author    Eric Sizemore <admin@secondversion.com>
  * @package   Simple Template Engine
  * @link      http://www.secondversion.com/
- * @version   2.0.0
+ * @version   2.0.1
  * @copyright (C) 2006-2023 Eric Sizemore
  * @license   https://www.gnu.org/licenses/gpl-3.0.en.html GNU Public License
  *
@@ -140,20 +140,20 @@ class Template
     public function parse(string $tplFile): string
     {
         // Make sure it's a valid file, and it exists
-        if (!\is_file($tplFile) OR !\is_readable($tplFile)) {
+        if (!\is_file($tplFile) || !\is_readable($tplFile)) {
             throw new \InvalidArgumentException(sprintf('"%s" does not exist or is not a file.', $tplFile));
         }
 
         $contents = \file_get_contents($tplFile);
 
         // Make sure it has content. file_get_contents can return 'false' on error
-        if ($contents === '' OR $contents === false) {
+        if ($contents === '' || $contents === false) {
             throw new \Exception(\sprintf('"%s" does not appear to have any valid content.', $tplFile));
         }
 
         // Process replacements
-		/** @var string $replace **/
-        foreach ($this->tplVars AS $find => $replace) {
+        /** @var string $replace **/
+        foreach ($this->tplVars as $find => $replace) {
             $contents = \str_replace(\sprintf(
                 '%s%s%s',
                 $this->leftDelimiter,

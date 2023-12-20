@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Simple Template Engine
@@ -8,7 +8,7 @@ declare(strict_types = 1);
  * @author    Eric Sizemore <admin@secondversion.com>
  * @package   Simple Template Engine
  * @link      http://www.secondversion.com/
- * @version   2.0.0
+ * @version   2.0.1
  * @copyright (C) 2006-2023 Eric Sizemore
  * @license   https://www.gnu.org/licenses/gpl-3.0.en.html GNU Public License
  *

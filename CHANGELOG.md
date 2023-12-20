@@ -13,6 +13,7 @@ Simply replace the version numbers depending on which set of changes you wish to
   * Updated PHPUnit tests to use `self::` instead of `$this->` for PHPUnit related functions
   * Updated workflows for test coverage and Scrutinizer
   * Added new test to push test coverage to 100%
+  * A little cleanup and formatting
 
 ### 2.0.0 (2023-09-22)
   * BC BREAK: Namespace changes

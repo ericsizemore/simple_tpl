@@ -1,5 +1,7 @@
 # Simple Template Engine - Text based template parser.
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
 [![PHPStan](https://github.com/ericsizemore/simple_tpl/actions/workflows/ci.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/ci.yml)
 [![Psalm Security Scan](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml)
 [![Tests](https://github.com/ericsizemore/simple_tpl/actions/workflows/tests.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/tests.yml)
