@@ -2,9 +2,17 @@
 A not so exhaustive list of changes for each release.
 
 For a more detailed listing of changes between each version, 
-you can use the following url: https://github.com/ericsizemore/simple_tpl/compare/v1.0.5...v2.0.0. 
+you can use the following url: https://github.com/ericsizemore/simple_tpl/compare/v1.0.5...v2.0.1. 
 
 Simply replace the version numbers depending on which set of changes you wish to see.
+
+### 2.0.1 (2023-12-20)
+  * Updated composer.json for PHP ^8.1 but <8.5
+    * Added PHPStan strict rules
+  * Updated PHPUnit tests to use the PHPUnit CoversClass and DataProvider attributes.
+  * Updated PHPUnit tests to use `self::` instead of `$this->` for PHPUnit related functions
+  * Updated workflows for test coverage and Scrutinizer
+  * Added new test to push test coverage to 100%
 
 ### 2.0.0 (2023-09-22)
   * BC BREAK: Namespace changes
