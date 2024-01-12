@@ -25,6 +25,7 @@ declare(strict_types=1);
  *    You should have received a copy of the GNU General Public License
  *    along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Esi\SimpleTpl\Tests;
 
 use Esi\SimpleTpl\Template;
@@ -34,23 +35,16 @@ use PHPUnit\Framework\Attributes\CoversClass;
 /**
  */
 #[CoversClass(Template::class)]
-class TemplateTest extends TestCase
+final class TemplateTest extends TestCase
 {
-    /**
-     * @var string
-     */
     protected static string $testDir;
-
     /**
      * @var array<string>
      */
     protected static array $testFiles;
-
-    /**
-     */
     public static function setUpBeforeClass(): void
     {
-        self::$testDir = \dirname(__FILE__) . \DIRECTORY_SEPARATOR . 'dir1';
+        self::$testDir = __DIR__ . \DIRECTORY_SEPARATOR . 'dir1';
         self::$testFiles = [
             'file1' => self::$testDir . \DIRECTORY_SEPARATOR . 'file1',
             'file2' => self::$testDir . \DIRECTORY_SEPARATOR . 'file2'
@@ -68,9 +62,6 @@ class TemplateTest extends TestCase
             \touch(self::$testFiles['file2']);
         }
     }
-
-    /**
-     */
     public static function tearDownAfterClass(): void
     {
         \unlink(self::$testFiles['file1']);
@@ -81,7 +72,6 @@ class TemplateTest extends TestCase
         self::$testDir = '';
         self::$testFiles = [];
     }
-
     /**
      * Test setLeftDelimiter()
      */
@@ -95,8 +85,6 @@ class TemplateTest extends TestCase
         $template->setLeftDelimiter('{');
         self::assertEquals('{', $template->getLeftDelimiter());
     }
-
-
     /**
      * Test setRightDelimiter()
      */
@@ -110,7 +98,6 @@ class TemplateTest extends TestCase
         $template->setRightDelimiter('}');
         self::assertEquals('}', $template->getRightDelimiter());
     }
-
     /**
      * Test assign() and toArray()
      */
@@ -128,7 +115,6 @@ class TemplateTest extends TestCase
             'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
         ], $template->toArray());
     }
-
     /**
      * Test display()
      */
@@ -136,12 +122,14 @@ class TemplateTest extends TestCase
     {
         $template = new Template();
 
-        \file_put_contents(self::$testFiles['file1'], <<<html
+        \file_put_contents(
+            self::$testFiles['file1'],
+            <<<html_WRAP
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html" />
-	<title>{title}</title>
+\t<meta http-equiv="content-type" content="text/html" />
+\t<title>{title}</title>
 </head>
 
 <body>
@@ -150,7 +138,8 @@ class TemplateTest extends TestCase
 
 </body>
 </html>
-html);
+html_WRAP
+        );
 
         $template->assign([
             'title'   => 'Simple Template Engine Test',
@@ -162,12 +151,12 @@ html);
         $data = \ob_get_contents();
         \ob_end_clean();
 
-        self::assertEquals(<<<html
+        self::assertEquals(<<<html_WRAP
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html" />
-	<title>Simple Template Engine Test</title>
+\t<meta http-equiv="content-type" content="text/html" />
+\t<title>Simple Template Engine Test</title>
 </head>
 
 <body>
@@ -176,9 +165,9 @@ html);
 
 </body>
 </html>
-html, $data);
+html_WRAP
+            , $data);
     }
-
     /**
      * Test parse() with non-existent file
      */
@@ -189,9 +178,8 @@ html, $data);
         /** @scrutinizer ignore-call */
         self::expectException(\InvalidArgumentException::class);
 
-        $template->parse('/this/should/not/exist.tpl');        
+        $template->parse('/this/should/not/exist.tpl');
     }
-
     /**
      * Test parse() with empty file
      */
@@ -206,7 +194,6 @@ html, $data);
 
         $template->parse(self::$testFiles['file2']);
     }
-
     /**
      * Test parse()
      */
@@ -214,12 +201,14 @@ html, $data);
     {
         $template = new Template();
 
-        \file_put_contents(self::$testFiles['file1'], <<<html
+        \file_put_contents(
+            self::$testFiles['file1'],
+            <<<html_WRAP
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html" />
-	<title>{title}</title>
+\t<meta http-equiv="content-type" content="text/html" />
+\t<title>{title}</title>
 </head>
 
 <body>
@@ -228,7 +217,8 @@ html, $data);
 
 </body>
 </html>
-html);
+html_WRAP
+        );
 
         $template->assign([
             'title'   => 'Simple Template Engine Test',
@@ -237,12 +227,12 @@ html);
 
         $data = $template->parse(self::$testFiles['file1']);
 
-        self::assertEquals(<<<html
+        self::assertEquals(<<<html_WRAP
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html" />
-	<title>Simple Template Engine Test</title>
+\t<meta http-equiv="content-type" content="text/html" />
+\t<title>Simple Template Engine Test</title>
 </head>
 
 <body>
@@ -251,7 +241,8 @@ html);
 
 </body>
 </html>
-html, $data);
+html_WRAP
+            , $data);
 
     }
 }

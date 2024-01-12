@@ -25,13 +25,14 @@ declare(strict_types=1);
  *    You should have received a copy of the GNU General Public License
  *    along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace Esi\SimpleTpl;
 
 /**
  * Pretty simple template engine. Performs simple search and replace on defined
  * variables.
  */
-class Template
+final class Template
 {
     /**
      * Template variables and their replacements
@@ -43,9 +44,9 @@ class Template
     /**
      * Delimiters to use when search for the variables to replace.
      *
-     * @var  string
      */
     private string $leftDelimiter = '{';
+
     private string $rightDelimiter = '}';
 
     /**
@@ -58,8 +59,6 @@ class Template
 
     /**
      * Setter for {@see self::$leftDelimiter}
-     *
-     * @param  string  $delimiter
      */
     public function setLeftDelimiter(string $delimiter): void
     {
@@ -69,7 +68,6 @@ class Template
     /**
      * Getter for {@see self::$leftDelimiter}
      *
-     * @return  string
      */
     public function getLeftDelimiter(): string
     {
@@ -78,8 +76,6 @@ class Template
 
     /**
      * Setter for {@see self::$rightDelimiter}
-     *
-     * @param  string  $delimiter
      */
     public function setRightDelimiter(string $delimiter): void
     {
@@ -89,7 +85,6 @@ class Template
     /**
      * Getter for {@see self::$rightDelimiter}
      *
-     * @return  string
      */
     public function getRightDelimiter(): string
     {
@@ -161,6 +156,7 @@ class Template
                 $this->rightDelimiter
             ), $replace, $contents);
         }
+
         return $contents;
     }
 }
