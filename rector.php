@@ -16,7 +16,6 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/tests/src',
     ]);
 
-    $rectorConfig->phpVersion(PhpVersion::PHP_81);
     $rectorConfig->phpVersion(PhpVersion::PHP_82);
     $rectorConfig->phpVersion(PhpVersion::PHP_83);
     //$rectorConfig->importNames();
@@ -29,7 +28,7 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::NAMING,
         SetList::PRIVATIZATION,
         SetList::EARLY_RETURN,
-        LevelSetList::UP_TO_PHP_81,
+        LevelSetList::UP_TO_PHP_82,
         PHPUnitSetList::PHPUNIT_100,
     ]);
     $rectorConfig->skip([LocallyCalledStaticMethodToNonStaticRector::class]);

@@ -37,11 +37,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Template::class)]
 final class TemplateTest extends TestCase
 {
-    protected static string $testDir;
+    private static string $testDir;
+
     /**
      * @var array<string>
      */
-    protected static array $testFiles;
+    private static array $testFiles;
+
     public static function setUpBeforeClass(): void
     {
         self::$testDir = __DIR__ . \DIRECTORY_SEPARATOR . 'dir1';
@@ -62,16 +64,18 @@ final class TemplateTest extends TestCase
             \touch(self::$testFiles['file2']);
         }
     }
+
     public static function tearDownAfterClass(): void
     {
         \unlink(self::$testFiles['file1']);
         \unlink(self::$testFiles['file2']);
-        \usleep(90000);
+        \usleep(100000);
         \rmdir(self::$testDir);
 
         self::$testDir = '';
         self::$testFiles = [];
     }
+
     /**
      * Test setLeftDelimiter()
      */
@@ -85,6 +89,7 @@ final class TemplateTest extends TestCase
         $template->setLeftDelimiter('{');
         self::assertEquals('{', $template->getLeftDelimiter());
     }
+
     /**
      * Test setRightDelimiter()
      */
@@ -98,6 +103,7 @@ final class TemplateTest extends TestCase
         $template->setRightDelimiter('}');
         self::assertEquals('}', $template->getRightDelimiter());
     }
+
     /**
      * Test assign() and toArray()
      */
@@ -115,6 +121,7 @@ final class TemplateTest extends TestCase
             'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
         ], $template->toArray());
     }
+
     /**
      * Test display()
      */
@@ -168,6 +175,7 @@ html_WRAP
 html_WRAP
             , $data);
     }
+
     /**
      * Test parse() with non-existent file
      */
@@ -180,6 +188,7 @@ html_WRAP
 
         $template->parse('/this/should/not/exist.tpl');
     }
+
     /**
      * Test parse() with empty file
      */
@@ -194,6 +203,7 @@ html_WRAP
 
         $template->parse(self::$testFiles['file2']);
     }
+
     /**
      * Test parse()
      */
