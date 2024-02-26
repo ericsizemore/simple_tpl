@@ -6,6 +6,10 @@ you can use the following url: https://github.com/ericsizemore/simple_tpl/compar
 
 Simply replace the version numbers depending on which set of changes you wish to see.
 
+### 3.0.0 (-dev)
+  * Bumped minimum PHP version requirement to 8.2
+  * Added PHP-CS-Fixer to dev requirements.
+
 ### 2.0.1 (2023-12-20)
   * Updated composer.json for PHP ^8.1 but <8.5
     * Added PHPStan strict rules
