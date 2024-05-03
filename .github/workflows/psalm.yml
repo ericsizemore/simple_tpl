@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Psalm Security Scan
-        uses: psalm/psalm-github-security-scan@676c696e45934c942bdde2b8921eb5081a2a8c31
+        uses: psalm/psalm-github-security-scan@dca66b2a9bbeef856ba3e359b486a596356447c6
 
       - name: Upload Security Analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
