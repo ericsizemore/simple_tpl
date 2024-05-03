@@ -8,7 +8,11 @@ Simply replace the version numbers depending on which set of changes you wish to
 
 ### 3.0.0 (-dev)
   * Bumped minimum PHP version requirement to 8.2
-  * Added PHP-CS-Fixer to dev requirements.
+  * Updated header docblock in each source file to be more compact.
+  * Updated with new coding standards and fixes to issues reported by Psalm.
+  * Added new dev requirements.
+    * PHP-CS-Fixer
+    * Psalm
 
 ### 2.0.1 (2023-12-20)
   * Updated composer.json for PHP ^8.1 but <8.5

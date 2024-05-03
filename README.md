@@ -1,10 +1,13 @@
 # Simple Template Engine - Text based template parser.
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/build.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
 [![PHPStan](https://github.com/ericsizemore/simple_tpl/actions/workflows/ci.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/ci.yml)
-[![Psalm Security Scan](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml)
 [![Tests](https://github.com/ericsizemore/simple_tpl/actions/workflows/tests.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/tests.yml)
+[![Psalm Static analysis](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml/badge.svg?branch=master)](https://github.com/ericsizemore/simple_tpl/actions/workflows/psalm.yml)
+[![Type Coverage](https://shepherd.dev/github/ericsizemore/simple_tpl/coverage.svg)](https://shepherd.dev/github/ericsizemore/simple_tpl)
+[![Psalm Level](https://shepherd.dev/github/ericsizemore/simple_tpl/level.svg)](https://shepherd.dev/github/ericsizemore/simple_tpl)
 [![Latest Stable Version](https://img.shields.io/packagist/v/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
 [![Downloads per Month](https://img.shields.io/packagist/dm/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
 [![License](https://img.shields.io/packagist/l/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)

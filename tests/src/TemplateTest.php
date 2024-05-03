@@ -3,36 +3,39 @@
 declare(strict_types=1);
 
 /**
- * Simple Template Engine
+ * This file is part of Esi\SimpleTpl.
  *
- * @author    Eric Sizemore <admin@secondversion.com>
- * @package   Simple Template Engine
- * @link      http://www.secondversion.com/
- * @version   2.0.1
- * @copyright (C) 2006-2023 Eric Sizemore
- * @license   https://www.gnu.org/licenses/gpl-3.0.en.html GNU Public License
+ * (c) 2006 - 2024 Eric Sizemore <admin@secondversion.com>
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * This file is licensed under the GNU Public License v3. For the full
+ * copyright and license information, please view the LICENSE.md file
+ * that was distributed with this source code.
  */
 
 namespace Esi\SimpleTpl\Tests;
 
 use Esi\SimpleTpl\Template;
-use PHPUnit\Framework\TestCase;
+use Exception;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+use function file_exists;
+use function file_put_contents;
+use function is_dir;
+use function mkdir;
+use function ob_end_clean;
+use function ob_get_contents;
+use function ob_start;
+use function rmdir;
+use function touch;
+use function unlink;
+use function usleep;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
+ * @internal
  */
 #[CoversClass(Template::class)]
 final class TemplateTest extends TestCase
@@ -46,66 +49,38 @@ final class TemplateTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$testDir = __DIR__ . \DIRECTORY_SEPARATOR . 'dir1';
+        self::$testDir   = __DIR__ . DIRECTORY_SEPARATOR . 'dir1';
         self::$testFiles = [
-            'file1' => self::$testDir . \DIRECTORY_SEPARATOR . 'file1',
-            'file2' => self::$testDir . \DIRECTORY_SEPARATOR . 'file2'
+            'file1' => self::$testDir . DIRECTORY_SEPARATOR . 'file1',
+            'file2' => self::$testDir . DIRECTORY_SEPARATOR . 'file2',
         ];
 
-        if (!\is_dir(self::$testDir)) {
-            \mkdir(self::$testDir);
+        if (!is_dir(self::$testDir)) {
+            mkdir(self::$testDir);
         }
 
-        if (!\file_exists(self::$testFiles['file1'])) {
-            \touch(self::$testFiles['file1']);
+        if (!file_exists(self::$testFiles['file1'])) {
+            touch(self::$testFiles['file1']);
         }
 
-        if (!\file_exists(self::$testFiles['file2'])) {
-            \touch(self::$testFiles['file2']);
+        if (!file_exists(self::$testFiles['file2'])) {
+            touch(self::$testFiles['file2']);
         }
     }
 
     public static function tearDownAfterClass(): void
     {
-        \unlink(self::$testFiles['file1']);
-        \unlink(self::$testFiles['file2']);
-        \usleep(100000);
-        \rmdir(self::$testDir);
+        unlink(self::$testFiles['file1']);
+        unlink(self::$testFiles['file2']);
+        usleep(100000);
+        rmdir(self::$testDir);
 
-        self::$testDir = '';
+        self::$testDir   = '';
         self::$testFiles = [];
     }
 
     /**
-     * Test setLeftDelimiter()
-     */
-    public function testSetLeftDelimiter(): void
-    {
-        $template = new Template();
-
-        $template->setLeftDelimiter('{{');
-        self::assertEquals('{{', $template->getLeftDelimiter());
-
-        $template->setLeftDelimiter('{');
-        self::assertEquals('{', $template->getLeftDelimiter());
-    }
-
-    /**
-     * Test setRightDelimiter()
-     */
-    public function testSetRightDelimiter(): void
-    {
-        $template = new Template();
-
-        $template->setRightDelimiter('}}');
-        self::assertEquals('}}', $template->getRightDelimiter());
-
-        $template->setRightDelimiter('}');
-        self::assertEquals('}', $template->getRightDelimiter());
-    }
-
-    /**
-     * Test assign() and toArray()
+     * Test assign() and toArray().
      */
     public function testAssign(): void
     {
@@ -113,146 +88,172 @@ final class TemplateTest extends TestCase
 
         $template->assign([
             'title'   => 'Simple Template Engine Test',
-            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
         ]);
 
-        self::assertEquals([
+        self::assertSame([
             'title'   => 'Simple Template Engine Test',
-            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
         ], $template->toArray());
     }
 
     /**
-     * Test display()
+     * Test display().
      */
     public function testDisplay(): void
     {
         $template = new Template();
 
-        \file_put_contents(
+        file_put_contents(
             self::$testFiles['file1'],
             <<<html_WRAP
-<!DOCTYPE HTML>
-<html>
-<head>
-\t<meta http-equiv="content-type" content="text/html" />
-\t<title>{title}</title>
-</head>
+                <!DOCTYPE HTML>
+                <html>
+                <head>
+                \t<meta http-equiv="content-type" content="text/html" />
+                \t<title>{title}</title>
+                </head>
 
-<body>
+                <body>
 
-<p>{content}</p>
+                <p>{content}</p>
 
-</body>
-</html>
-html_WRAP
+                </body>
+                </html>
+                html_WRAP
         );
 
         $template->assign([
             'title'   => 'Simple Template Engine Test',
-            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
         ]);
 
-        \ob_start();
+        ob_start();
         $template->display(self::$testFiles['file1']);
-        $data = \ob_get_contents();
-        \ob_end_clean();
+        $data = ob_get_contents();
+        ob_end_clean();
 
-        self::assertEquals(<<<html_WRAP
-<!DOCTYPE HTML>
-<html>
-<head>
-\t<meta http-equiv="content-type" content="text/html" />
-\t<title>Simple Template Engine Test</title>
-</head>
+        self::assertSame(<<<html_WRAP
+            <!DOCTYPE HTML>
+            <html>
+            <head>
+            \t<meta http-equiv="content-type" content="text/html" />
+            \t<title>Simple Template Engine Test</title>
+            </head>
 
-<body>
+            <body>
 
-<p>This is a test of the Simple Template Engine class by Eric Sizemore.</p>
+            <p>This is a test of the Simple Template Engine class by Eric Sizemore.</p>
 
-</body>
-</html>
-html_WRAP
-            , $data);
+            </body>
+            </html>
+            html_WRAP, $data);
     }
 
     /**
-     * Test parse() with non-existent file
+     * Test parse().
+     */
+    public function testParse(): void
+    {
+        $template = new Template();
+
+        file_put_contents(
+            self::$testFiles['file1'],
+            <<<html_WRAP
+                <!DOCTYPE HTML>
+                <html>
+                <head>
+                \t<meta http-equiv="content-type" content="text/html" />
+                \t<title>{title}</title>
+                </head>
+
+                <body>
+
+                <p>{content}</p>
+
+                </body>
+                </html>
+                html_WRAP
+        );
+
+        $template->assign([
+            'title'   => 'Simple Template Engine Test',
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+        ]);
+
+        $data = $template->parse(self::$testFiles['file1']);
+
+        self::assertSame(<<<html_WRAP
+            <!DOCTYPE HTML>
+            <html>
+            <head>
+            \t<meta http-equiv="content-type" content="text/html" />
+            \t<title>Simple Template Engine Test</title>
+            </head>
+
+            <body>
+
+            <p>This is a test of the Simple Template Engine class by Eric Sizemore.</p>
+
+            </body>
+            </html>
+            html_WRAP, $data);
+
+    }
+
+    /**
+     * Test parse() with empty file.
+     */
+    public function testParseEmptyFile(): void
+    {
+        $template = new Template();
+
+        file_put_contents(self::$testFiles['file2'], '');
+
+        /** @scrutinizer ignore-call */
+        self::expectException(Exception::class);
+
+        $template->parse(self::$testFiles['file2']);
+    }
+
+    /**
+     * Test parse() with non-existent file.
      */
     public function testParseInvalidFile(): void
     {
         $template = new Template();
 
         /** @scrutinizer ignore-call */
-        self::expectException(\InvalidArgumentException::class);
+        self::expectException(InvalidArgumentException::class);
 
         $template->parse('/this/should/not/exist.tpl');
     }
 
     /**
-     * Test parse() with empty file
+     * Test setLeftDelimiter().
      */
-    public function testParseEmptyFile(): void
+    public function testSetLeftDelimiter(): void
     {
         $template = new Template();
 
-        \file_put_contents(self::$testFiles['file2'], '');
+        $template->setLeftDelimiter('{{');
+        self::assertSame('{{', $template->getLeftDelimiter());
 
-        /** @scrutinizer ignore-call */
-        self::expectException(\Exception::class);
-
-        $template->parse(self::$testFiles['file2']);
+        $template->setLeftDelimiter('{');
+        self::assertSame('{', $template->getLeftDelimiter());
     }
 
     /**
-     * Test parse()
+     * Test setRightDelimiter().
      */
-    public function testParse(): void
+    public function testSetRightDelimiter(): void
     {
         $template = new Template();
 
-        \file_put_contents(
-            self::$testFiles['file1'],
-            <<<html_WRAP
-<!DOCTYPE HTML>
-<html>
-<head>
-\t<meta http-equiv="content-type" content="text/html" />
-\t<title>{title}</title>
-</head>
+        $template->setRightDelimiter('}}');
+        self::assertSame('}}', $template->getRightDelimiter());
 
-<body>
-
-<p>{content}</p>
-
-</body>
-</html>
-html_WRAP
-        );
-
-        $template->assign([
-            'title'   => 'Simple Template Engine Test',
-            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.'
-        ]);
-
-        $data = $template->parse(self::$testFiles['file1']);
-
-        self::assertEquals(<<<html_WRAP
-<!DOCTYPE HTML>
-<html>
-<head>
-\t<meta http-equiv="content-type" content="text/html" />
-\t<title>Simple Template Engine Test</title>
-</head>
-
-<body>
-
-<p>This is a test of the Simple Template Engine class by Eric Sizemore.</p>
-
-</body>
-</html>
-html_WRAP
-            , $data);
-
+        $template->setRightDelimiter('}');
+        self::assertSame('}', $template->getRightDelimiter());
     }
 }
