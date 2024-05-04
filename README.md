@@ -9,7 +9,7 @@
 [![Type Coverage](https://shepherd.dev/github/ericsizemore/simple_tpl/coverage.svg)](https://shepherd.dev/github/ericsizemore/simple_tpl)
 [![Psalm Level](https://shepherd.dev/github/ericsizemore/simple_tpl/level.svg)](https://shepherd.dev/github/ericsizemore/simple_tpl)
 [![Latest Stable Version](https://img.shields.io/packagist/v/esi/simple_tpl.svg?label=stable)](https://packagist.org/packages/esi/simple_tpl)
-![Development Version](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fgithub.com%2Fericsizemore%2Fsimple_tpl%2Fraw%2Fmaster%2Fcomposer.json&query=%24%5B'extra'%5D%5B'branch-alias'%5D%5B'dev-master'%5D&label=unstable&color=%23ff4c00&link=https%3A%2F%2Fgithub.com%2Fericsizemore%2Fsimple_tpl%2Ftree%2Fmaster)
+[![Development Version](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fgithub.com%2Fericsizemore%2Fsimple_tpl%2Fraw%2Fmaster%2Fcomposer.json&query=%24%5B'extra'%5D%5B'branch-alias'%5D%5B'dev-master'%5D&label=unstable&color=%23ff4c00)](https://github.com/ericsizemore/simple_tpl/tree/master)
 [![Downloads per Month](https://img.shields.io/packagist/dm/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
 <!-- Remove until 3.x release
 [![License](https://img.shields.io/packagist/l/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
