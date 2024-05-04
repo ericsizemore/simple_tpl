@@ -1,12 +1,3 @@
-.idea/
 vendor/
 build/
-dochtml/
 .php-cs-fixer.cache
-*.iws
-out/
-.idea_modules/
-atlassian-ide-plugin.xml
-.idea/php.xml
-.idea/simple_tpl.iml
-clover.xml

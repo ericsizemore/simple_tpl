@@ -7,9 +7,9 @@ $header = <<<'EOF'
 
     (c) 2006 - 2024 Eric Sizemore <admin@secondversion.com>
 
-    This file is licensed under the GNU Public License v3. For the full
-    copyright and license information, please view the LICENSE.md file
-    that was distributed with this source code.
+    This file is licensed under The MIT License. For the full copyright and
+    license information, please view the LICENSE.md file that was distributed
+    with this source code.
     EOF;
 
 $config = new PhpCsFixer\Config();
@@ -37,13 +37,13 @@ $config
         'fully_qualified_strict_types' => true,
         'header_comment'               => ['comment_type' => 'PHPDoc', 'header' => $header, 'separate' => 'top'],
         'heredoc_to_nowdoc'            => true,
-        //'global_namespace_import'                      => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
-        'native_function_invocation'                    => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced', 'strict' => true],
-        'native_constant_invocation'                    => ['fix_built_in' => false, 'include' => ['DIRECTORY_SEPARATOR', 'PHP_INT_SIZE', 'PHP_SAPI', 'PHP_VERSION_ID'], 'scope' => 'namespaced', 'strict' => true],
-        'no_leading_import_slash'                       => true,
-        'no_unneeded_import_alias'                      => true,
-        'no_unused_imports'                             => true,
-        'ordered_class_elements'                        => [
+        //'global_namespace_import'    => ['import_classes' => true, 'import_constants' => false, 'import_functions' => true],
+        'native_function_invocation'   => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced', 'strict' => true],
+        'native_constant_invocation'   => ['fix_built_in' => false, 'include' => ['DIRECTORY_SEPARATOR', 'PHP_INT_SIZE', 'PHP_SAPI', 'PHP_VERSION_ID'], 'scope' => 'namespaced', 'strict' => true],
+        'no_leading_import_slash'      => true,
+        'no_unneeded_import_alias'     => true,
+        'no_unused_imports'            => true,
+        'ordered_class_elements'       => [
             'order' => [
                 'use_trait',
                 'case',
@@ -110,6 +110,7 @@ $config
     ->setLineEnding("\n")
     ->setFinder(
         PhpCsFixer\Finder::create()
+            ->in(__DIR__ . '/examples')
             ->in(__DIR__ . '/src')
             ->in(__DIR__ . '/tests')
     )

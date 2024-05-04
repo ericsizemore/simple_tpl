@@ -7,39 +7,40 @@ declare(strict_types=1);
  *
  * (c) 2006 - 2024 Eric Sizemore <admin@secondversion.com>
  *
- * This file is licensed under the GNU Public License v3. For the full
- * copyright and license information, please view the LICENSE.md file
- * that was distributed with this source code.
+ * This file is licensed under The MIT License. For the full copyright and
+ * license information, please view the LICENSE.md file that was distributed
+ * with this source code.
  */
 
 namespace Esi\SimpleTpl;
 
-use Exception;
 use InvalidArgumentException;
+use LogicException;
+use RuntimeException;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\PruneableInterface;
 
-use function array_merge;
+use function array_keys;
+use function array_map;
+use function array_values;
 use function file_get_contents;
 use function is_file;
 use function is_readable;
+use function md5;
 use function sprintf;
 use function str_replace;
+use function sys_get_temp_dir;
 
-/**
- * Pretty simple template engine. Performs simple search and replace on defined
- * variables.
- */
 final class Template
 {
-    /**
-     * Delimiters to use when search for the variables to replace.
-     */
+    private AdapterInterface $cache;
+
     private string $leftDelimiter = '{';
 
     private string $rightDelimiter = '}';
 
     /**
-     * Template variables and their replacements.
-     *
      * @var array<string>
      */
     private array $tplVars = [];
@@ -47,55 +48,44 @@ final class Template
     /**
      * Constructor.
      */
-    public function __construct() {}
-
-    /**
-     * Assign our variables and replacements.
-     *
-     * @param array<string> $tplVars Template variables and replacements
-     */
-    public function assign(array $tplVars): void
+    public function __construct(?AdapterInterface $cacheAdapter = null, ?string $cachePath = null)
     {
-        $this->tplVars = array_merge($this->tplVars, $tplVars);
+        $this->cache = $cacheAdapter ?? AbstractAdapter::createSystemCache('simple_tpl', 300, '', $cachePath ?? sys_get_temp_dir());
+        $this->pruneExpired();
     }
 
-    /**
-     * Output the template.
-     *
-     * Essentially just a wrapper for {@see self::parse()}
-     *
-     * @param string $tplFile Template file
-     */
+    public function clearCache(): bool
+    {
+        return $this->cache->clear();
+    }
+
     public function display(string $tplFile): void
     {
         echo $this->parse($tplFile);
     }
 
-    /**
-     * Getter for {@see self::$leftDelimiter}.
-     */
     public function getLeftDelimiter(): string
     {
         return $this->leftDelimiter;
     }
 
-    /**
-     * Getter for {@see self::$rightDelimiter}.
-     */
     public function getRightDelimiter(): string
     {
         return $this->rightDelimiter;
     }
 
     /**
-     * Parse the template file.
-     *
-     * @param string $tplFile Template file
-     *
+     * @return array<string>
+     */
+    public function getTplVars(): array
+    {
+        return $this->tplVars;
+    }
+
+    /**
      * @throws InvalidArgumentException if the file cannot be found or read.
-     * @throws Exception                if the file has no content.
-     *
-     * @return string Parsed template data
+     * @throws RuntimeException         if the file has no content.
+     * @throws LogicException           if there are no template variables set.
      */
     public function parse(string $tplFile): string
     {
@@ -104,49 +94,72 @@ final class Template
             throw new InvalidArgumentException(sprintf('"%s" does not exist or is not a file.', $tplFile));
         }
 
-        $contents = file_get_contents($tplFile);
+        $cacheKey = 'template_' . md5($tplFile);
 
-        // Make sure it has content. file_get_contents can return 'false' on error
-        if ($contents === '' || $contents === false) {
-            throw new Exception(sprintf('"%s" does not appear to have any valid content.', $tplFile));
+        if ($this->cache->hasItem($cacheKey)) {
+            /**
+             * @var string $templateCache
+             */
+            $templateCache = $this->cache->getItem($cacheKey)->get();
+
+            return $templateCache;
         }
 
-        // Process replacements
-        foreach ($this->tplVars as $find => $replace) {
-            $contents = str_replace(sprintf(
-                '%s%s%s',
-                $this->leftDelimiter,
-                $find,
-                $this->rightDelimiter
-            ), $replace, $contents);
+        $contents = (string) file_get_contents($tplFile);
+
+        // Make sure it has content.
+        if ($contents === '') {
+            throw new RuntimeException(sprintf('"%s" does not appear to have any valid content.', $tplFile));
         }
+
+        if ($this->tplVars === []) {
+            throw new LogicException('Unable to parse template, no tplVars found');
+        }
+
+        // Perform replacements
+        $contents = str_replace(
+            array_map(
+                fn (int|string $find): string => sprintf('%s%s%s', $this->leftDelimiter, $find, $this->rightDelimiter),
+                array_keys($this->tplVars)
+            ),
+            array_values($this->tplVars),
+            $contents
+        );
+
+        $this->cache->save($this->cache->getItem($cacheKey)->set($contents));
 
         return $contents;
     }
 
-    /**
-     * Setter for {@see self::$leftDelimiter}.
-     */
+    public function pruneExpired(): void
+    {
+        if ($this->cache instanceof PruneableInterface) {
+            $this->cache->prune();
+        }
+    }
+
+    public function refreshCache(string $tplFile): bool
+    {
+        $cacheKey = 'template_' . md5($tplFile);
+
+        return $this->cache->deleteItem($cacheKey);
+    }
+
     public function setLeftDelimiter(string $delimiter): void
     {
         $this->leftDelimiter = $delimiter;
     }
 
-    /**
-     * Setter for {@see self::$rightDelimiter}.
-     */
     public function setRightDelimiter(string $delimiter): void
     {
         $this->rightDelimiter = $delimiter;
     }
 
     /**
-     * Return the currently assigned variables.
-     *
-     * @return array<string>
+     * @param array<string> $tplVars Template variables and replacements
      */
-    public function toArray(): array
+    public function setTplVars(array $tplVars): void
     {
-        return $this->tplVars;
+        $this->tplVars = $tplVars;
     }
 }
