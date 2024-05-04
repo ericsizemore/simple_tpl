@@ -160,6 +160,10 @@ final class Template
      */
     public function setTplVars(array $tplVars): void
     {
-        $this->tplVars = $tplVars;
+        if (\count($tplVars) === 0) {
+            $this->tplVars = [];
+        } else {
+            $this->tplVars = \array_merge($this->tplVars, $tplVars);
+        }
     }
 }

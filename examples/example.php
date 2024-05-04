@@ -13,18 +13,10 @@ declare(strict_types=1);
  */
 // Include composer autoload file
 require_once 'vendor/autoload.php';
+
 use Esi\SimpleTpl\Template;
 
 $tpl = new Template();
-
-/*
-Or if you aren't using via composer, you can use the
-following code:
-
-// Include class file and instantiate.
-require_once '../src/Template.php';
-$tpl = new \Esi\SimpleTpl\Template();
-*/
 
 /**
  * assign expects an array of:
@@ -33,12 +25,12 @@ $tpl = new \Esi\SimpleTpl\Template();
  * Variables in your template(s) should be in the form of:
  *     {variable}
  */
-$tpl->assign([
+$tpl->setTplVars([
     'title'   => 'Simple Template Engine Test',
     'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
 ]);
 
 // Parse the template file
-$tpl->display('example.tpl');
+$tpl->display(__DIR__ . '/example.tpl');
 
 // It's that simple, really.

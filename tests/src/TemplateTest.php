@@ -250,20 +250,19 @@ final class TemplateTest extends TestCase
             'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
         ], $template->getTplVars());
 
-        $template->setTplVars([]);
-        $tplVars = $template->getTplVars();
-
-        self::assertSame([], $tplVars);
-
         $template->setTplVars([
-            'title'   => 'Simple Template Engine Test',
-            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+            'altTitle' => 'Can setTplVars merge?',
+            'altContent' => 'Test if variables are merged.'
         ]);
 
-        $tplVars = $template->getTplVars();
         self::assertSame([
             'title'   => 'Simple Template Engine Test',
             'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
-        ], $tplVars);
+            'altTitle' => 'Can setTplVars merge?',
+            'altContent' => 'Test if variables are merged.'
+        ], $template->getTplVars());
+
+        $template->setTplVars([]);
+        self::assertSame([], $template->getTplVars());
     }
 }

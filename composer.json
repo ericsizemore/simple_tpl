@@ -3,6 +3,12 @@
     "description": "Simple TPL - A Simple Template Engine",
     "license": "MIT",
     "type": "library",
+    "keywords": [
+        "template",
+        "template-engine",
+        "text",
+        "text-replacement"
+    ],
     "authors": [
         {
             "name": "Eric Sizemore",
@@ -46,8 +52,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev",
-            "dev-2.x": "2.x-dev"
+            "dev-2.x": "2.x-dev",
+            "dev-master": "3.0-dev"
         }
     },
     "scripts": {
