@@ -17,12 +17,13 @@ namespace Esi\SimpleTpl;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\PruneableInterface;
 
 use function array_keys;
 use function array_map;
+use function array_merge;
 use function array_values;
 use function file_get_contents;
 use function is_file;
@@ -163,7 +164,7 @@ final class Template
         if (\count($tplVars) === 0) {
             $this->tplVars = [];
         } else {
-            $this->tplVars = \array_merge($this->tplVars, $tplVars);
+            $this->tplVars = array_merge($this->tplVars, $tplVars);
         }
     }
 }
