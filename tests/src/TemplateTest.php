@@ -98,7 +98,7 @@ final class TemplateTest extends TestCase
         $template = new Template();
 
         $this->expectException(RuntimeException::class);
-
+        $template->setTplVars(['foo' => 'bar']);
         $template->parse(self::$fixtureFiles['empty']);
     }
 

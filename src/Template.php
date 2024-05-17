@@ -106,15 +106,15 @@ final class Template
             return $templateCache;
         }
 
+        if ($this->tplVars === []) {
+            throw new LogicException('Unable to parse template, no tplVars found');
+        }
+
         $contents = (string) file_get_contents($tplFile);
 
         // Make sure it has content.
         if ($contents === '') {
             throw new RuntimeException(sprintf('"%s" does not appear to have any valid content.', $tplFile));
-        }
-
-        if ($this->tplVars === []) {
-            throw new LogicException('Unable to parse template, no tplVars found');
         }
 
         // Perform replacements
@@ -163,8 +163,10 @@ final class Template
     {
         if (\count($tplVars) === 0) {
             $this->tplVars = [];
-        } else {
-            $this->tplVars = array_merge($this->tplVars, $tplVars);
+
+            return;
         }
+
+        $this->tplVars = array_merge($this->tplVars, $tplVars);
     }
 }
