@@ -16,6 +16,7 @@ namespace Esi\SimpleTpl;
 
 use InvalidArgumentException;
 use LogicException;
+use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -29,7 +30,6 @@ use function file_get_contents;
 use function is_file;
 use function is_readable;
 use function md5;
-use function sprintf;
 use function str_replace;
 use function sys_get_temp_dir;
 
@@ -60,6 +60,9 @@ final class Template
         return $this->cache->clear();
     }
 
+    /**
+     * @throws PsrInvalidArgumentException
+     */
     public function display(string $tplFile): void
     {
         echo $this->parse($tplFile);
@@ -84,15 +87,16 @@ final class Template
     }
 
     /**
-     * @throws InvalidArgumentException if the file cannot be found or read.
-     * @throws RuntimeException         if the file has no content.
-     * @throws LogicException           if there are no template variables set.
+     * @throws InvalidArgumentException    if the file cannot be found or read.
+     * @throws RuntimeException            if the file has no content.
+     * @throws LogicException              if there are no template variables set.
+     * @throws PsrInvalidArgumentException
      */
     public function parse(string $tplFile): string
     {
         // Make sure it's a valid file, and it exists
         if (!is_file($tplFile) || !is_readable($tplFile)) {
-            throw new InvalidArgumentException(sprintf('"%s" does not exist or is not a file.', $tplFile));
+            throw new InvalidArgumentException(\sprintf('"%s" does not exist or is not a file.', $tplFile));
         }
 
         $cacheKey = 'template_' . md5($tplFile);
@@ -114,13 +118,13 @@ final class Template
 
         // Make sure it has content.
         if ($contents === '') {
-            throw new RuntimeException(sprintf('"%s" does not appear to have any valid content.', $tplFile));
+            throw new RuntimeException(\sprintf('"%s" does not appear to have any valid content.', $tplFile));
         }
 
         // Perform replacements
         $contents = str_replace(
             array_map(
-                fn (int|string $find): string => sprintf('%s%s%s', $this->leftDelimiter, $find, $this->rightDelimiter),
+                fn (int|string $find): string => \sprintf('%s%s%s', $this->leftDelimiter, $find, $this->rightDelimiter),
                 array_keys($this->tplVars)
             ),
             array_values($this->tplVars),
@@ -139,6 +143,9 @@ final class Template
         }
     }
 
+    /**
+     * @throws PsrInvalidArgumentException
+     */
     public function refreshCache(string $tplFile): bool
     {
         $cacheKey = 'template_' . md5($tplFile);
