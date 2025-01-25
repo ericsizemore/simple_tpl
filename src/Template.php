@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of Esi\SimpleTpl.
  *
- * (c) 2006 - 2024 Eric Sizemore <admin@secondversion.com>
+ * (c) 2006 - 2025 Eric Sizemore <admin@secondversion.com>
  *
  * This file is licensed under The MIT License. For the full copyright and
  * license information, please view the LICENSE.md file that was distributed
@@ -16,27 +16,21 @@ namespace Esi\SimpleTpl;
 
 use InvalidArgumentException;
 use LogicException;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use RuntimeException;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\Cache\PruneableInterface;
 
 use function array_keys;
 use function array_map;
 use function array_merge;
 use function array_values;
+use function crc32;
+use function dechex;
 use function file_get_contents;
-use function is_file;
-use function is_readable;
-use function md5;
 use function str_replace;
-use function sys_get_temp_dir;
 
 final class Template
 {
-    private AdapterInterface $cache;
-
     private string $leftDelimiter = '{';
 
     private string $rightDelimiter = '}';
@@ -49,15 +43,15 @@ final class Template
     /**
      * Constructor.
      */
-    public function __construct(?AdapterInterface $cacheAdapter = null, ?string $cachePath = null)
-    {
-        $this->cache = $cacheAdapter ?? AbstractAdapter::createSystemCache('simple_tpl', 300, '', $cachePath ?? sys_get_temp_dir());
-        $this->pruneExpired();
-    }
+    public function __construct(private readonly ?CacheItemPoolInterface $cacheItemPool = null) {}
 
     public function clearCache(): bool
     {
-        return $this->cache->clear();
+        if (!$this->isUsingCache()) {
+            return true;
+        }
+
+        return $this->cacheItemPool->clear();
     }
 
     /**
@@ -87,6 +81,14 @@ final class Template
     }
 
     /**
+     * @psalm-assert-if-true !null $this->cacheItemPool
+     */
+    public function isUsingCache(): bool
+    {
+        return $this->cacheItemPool instanceof CacheItemPoolInterface;
+    }
+
+    /**
      * @throws InvalidArgumentException    if the file cannot be found or read.
      * @throws RuntimeException            if the file has no content.
      * @throws LogicException              if there are no template variables set.
@@ -99,13 +101,14 @@ final class Template
             throw new InvalidArgumentException(\sprintf('"%s" does not exist or is not a file.', $tplFile));
         }
 
-        $cacheKey = 'template_' . md5($tplFile);
+        // are we using cache?
+        $cacheKey = self::generateCacheKey($tplFile);
 
-        if ($this->cache->hasItem($cacheKey)) {
+        if ($this->isUsingCache() && $this->cacheItemPool->hasItem($cacheKey)) {
             /**
              * @var string $templateCache
              */
-            $templateCache = $this->cache->getItem($cacheKey)->get();
+            $templateCache = $this->cacheItemPool->getItem($cacheKey)->get();
 
             return $templateCache;
         }
@@ -131,16 +134,11 @@ final class Template
             $contents
         );
 
-        $this->cache->save($this->cache->getItem($cacheKey)->set($contents));
+        if ($this->isUsingCache()) {
+            $this->cacheItemPool->save($this->cacheItemPool->getItem($cacheKey)->set($contents));
+        }
 
         return $contents;
-    }
-
-    public function pruneExpired(): void
-    {
-        if ($this->cache instanceof PruneableInterface) {
-            $this->cache->prune();
-        }
     }
 
     /**
@@ -148,9 +146,11 @@ final class Template
      */
     public function refreshCache(string $tplFile): bool
     {
-        $cacheKey = 'template_' . md5($tplFile);
+        if (!$this->isUsingCache()) {
+            return true;
+        }
 
-        return $this->cache->deleteItem($cacheKey);
+        return $this->cacheItemPool->deleteItem(self::generateCacheKey($tplFile));
     }
 
     public function setLeftDelimiter(string $delimiter): void
@@ -168,12 +168,17 @@ final class Template
      */
     public function setTplVars(array $tplVars): void
     {
-        if (\count($tplVars) === 0) {
+        if ($tplVars === []) {
             $this->tplVars = [];
 
             return;
         }
 
         $this->tplVars = array_merge($this->tplVars, $tplVars);
+    }
+
+    private static function generateCacheKey(string $file): string
+    {
+        return \sprintf('template_%s', dechex(crc32($file)));
     }
 }

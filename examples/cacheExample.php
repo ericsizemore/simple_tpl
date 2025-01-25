@@ -15,8 +15,26 @@ declare(strict_types=1);
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Esi\SimpleTpl\Template;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
-$tpl = new Template();
+/**
+ * NOTE: This example requires symfony/cache being installed.
+ */
+if (!class_exists(AbstractAdapter::class)) {
+    throw new RuntimeException('Please install symfony/cache to run this example. E.g.: composer require symfony/cache:^7.1');
+}
+
+/**
+ * Symfony's AbstractAdapter::createSystemCache() returns the best possible adapter that your runtime supports.
+ * Generally, it will create a cache via PHP files (Opcache must be enabled via opcache.enable in php.ini), and chain that with APCu if your system supports it.
+ *
+ * For more information on symfony/cache's available cache pool (PSR-6) adapters:
+ *
+ * @see https://symfony.com/doc/current/components/cache/cache_pools.html
+ */
+$tpl = new Template(
+    AbstractAdapter::createSystemCache(namespace: 'simple_tpl', defaultLifetime: 300, version: '', directory: sys_get_temp_dir())
+);
 
 /**
  * assign expects an array of:

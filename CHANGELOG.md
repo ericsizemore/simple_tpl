@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Added new dev requirements.
     * PHP-CS-Fixer
     * Psalm
-  * Added template caching with `symonfy/cache`.
+    * RectorPHP
+  * Added template caching via `PSR-6` support.
 
 ### Changed
 

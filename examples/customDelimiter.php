@@ -5,14 +5,14 @@ declare(strict_types=1);
 /**
  * This file is part of Esi\SimpleTpl.
  *
- * (c) 2006 - 2024 Eric Sizemore <admin@secondversion.com>
+ * (c) 2006 - 2025 Eric Sizemore <admin@secondversion.com>
  *
  * This file is licensed under The MIT License. For the full copyright and
  * license information, please view the LICENSE.md file that was distributed
  * with this source code.
  */
 // Include composer autoload file
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 use Esi\SimpleTpl\Template;
 
@@ -36,5 +36,3 @@ $tpl->setTplVars([
 
 // Parse the template file
 $tpl->display(__DIR__ . '/exampleCustomDelimiter.tpl');
-
-// It's that simple, really.

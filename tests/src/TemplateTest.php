@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of Esi\SimpleTpl.
  *
- * (c) 2006 - 2024 Eric Sizemore <admin@secondversion.com>
+ * (c) 2006 - 2025 Eric Sizemore <admin@secondversion.com>
  *
  * This file is licensed under The MIT License. For the full copyright and
  * license information, please view the LICENSE.md file that was distributed
@@ -21,11 +21,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystemFamily;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
 use function chmod;
 use function ob_get_clean;
 use function ob_start;
+use function sys_get_temp_dir;
 
 /**
  * @internal
@@ -61,7 +63,9 @@ final class TemplateTest extends TestCase
 
     public function testDisplayDoesDisplay(): void
     {
-        $template = new Template();
+        $template = new Template(
+            AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $template->setTplVars([
             'title'   => 'Simple Template Engine Test',
@@ -78,7 +82,9 @@ final class TemplateTest extends TestCase
 
     public function testGetTplVars(): void
     {
-        $template = new Template();
+        $template = new Template(
+            AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $template->setTplVars([
             'title'   => 'Simple Template Engine Test',
@@ -95,7 +101,9 @@ final class TemplateTest extends TestCase
 
     public function testParseEmptyTemplateFile(): void
     {
-        $template = new Template();
+        $template = new Template(
+            //AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $this->expectException(RuntimeException::class);
         $template->setTplVars(['foo' => 'bar']);
@@ -104,7 +112,9 @@ final class TemplateTest extends TestCase
 
     public function testParseInvalidTemplateFile(): void
     {
-        $template = new Template();
+        $template = new Template(
+            //AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -136,7 +146,9 @@ final class TemplateTest extends TestCase
     #[RequiresOperatingSystemFamily('Linux')]
     public function testParseUnreadableTemplateFile(): void
     {
-        $template = new Template();
+        $template = new Template(
+            //AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         chmod(self::$fixtureFiles['unreadable'], 0o000);
 
@@ -149,7 +161,9 @@ final class TemplateTest extends TestCase
 
     public function testParseWithCachedTemplate(): void
     {
-        $template = new Template();
+        $template = new Template(
+            AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $template->setTplVars([
             'title'   => 'Simple Template Engine Test',
@@ -172,7 +186,9 @@ final class TemplateTest extends TestCase
 
     public function testParseWithDirectoryNotFile(): void
     {
-        $template = new Template();
+        $template = new Template(
+            //AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -181,7 +197,9 @@ final class TemplateTest extends TestCase
 
     public function testParseWithoutTplVars(): void
     {
-        $template = new Template();
+        $template = new Template(
+            //AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $this->expectException(LogicException::class);
 
@@ -191,7 +209,9 @@ final class TemplateTest extends TestCase
 
     public function testRefreshCache(): void
     {
-        $template = new Template();
+        $template = new Template(
+            AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
+        );
 
         $template->setTplVars([
             'title'   => 'Simple Template Engine Test',
