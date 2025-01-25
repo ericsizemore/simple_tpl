@@ -45,6 +45,11 @@ final class Template
      */
     public function __construct(private readonly ?CacheItemPoolInterface $cacheItemPool = null) {}
 
+    /**
+     * Clears the cache.
+     *
+     * @return bool True if the cache was cleared successfully, false otherwise.
+     */
     public function clearCache(): bool
     {
         if (!$this->isUsingCache()) {
@@ -55,6 +60,10 @@ final class Template
     }
 
     /**
+     * Displays the parsed template.
+     *
+     * @param string $tplFile The path to the template file.
+     *
      * @throws PsrInvalidArgumentException
      */
     public function display(string $tplFile): void
@@ -62,18 +71,30 @@ final class Template
         echo $this->parse($tplFile);
     }
 
+    /**
+     * Gets the left delimiter.
+     *
+     * @return string The left delimiter.
+     */
     public function getLeftDelimiter(): string
     {
         return $this->leftDelimiter;
     }
 
+    /**
+     * Gets the right delimiter.
+     *
+     * @return string The right delimiter.
+     */
     public function getRightDelimiter(): string
     {
         return $this->rightDelimiter;
     }
 
     /**
-     * @return array<string>
+     * Gets the template variables.
+     *
+     * @return array<string> The template variables.
      */
     public function getTplVars(): array
     {
@@ -81,7 +102,11 @@ final class Template
     }
 
     /**
+     * Checks if caching is enabled.
+     *
      * @psalm-assert-if-true !null $this->cacheItemPool
+     *
+     * @return bool True if caching is enabled, false otherwise.
      */
     public function isUsingCache(): bool
     {
@@ -89,20 +114,22 @@ final class Template
     }
 
     /**
-     * @throws InvalidArgumentException    if the file cannot be found or read.
-     * @throws RuntimeException            if the file has no content.
-     * @throws LogicException              if there are no template variables set.
+     * Parses the template file and replaces variables.
+     *
+     * @param string $tplFile The path to the template file.
+     *
+     * @throws InvalidArgumentException    If the file cannot be found or read.
+     * @throws RuntimeException            If the file has no content.
+     * @throws LogicException              If there are no template variables set.
      * @throws PsrInvalidArgumentException
+     *
+     * @return string The parsed template content.
      */
     public function parse(string $tplFile): string
     {
-        // Make sure it's a valid file, and it exists
-        if (!is_file($tplFile) || !is_readable($tplFile)) {
-            throw new InvalidArgumentException(\sprintf('"%s" does not exist or is not a file.', $tplFile));
-        }
+        $this->validateFile($tplFile);
 
-        // are we using cache?
-        $cacheKey = self::generateCacheKey($tplFile);
+        $cacheKey = $this->generateCacheKey($tplFile);
 
         if ($this->isUsingCache() && $this->cacheItemPool->hasItem($cacheKey)) {
             /**
@@ -117,22 +144,10 @@ final class Template
             throw new LogicException('Unable to parse template, no tplVars found');
         }
 
-        $contents = (string) file_get_contents($tplFile);
-
-        // Make sure it has content.
-        if ($contents === '') {
-            throw new RuntimeException(\sprintf('"%s" does not appear to have any valid content.', $tplFile));
-        }
+        $contents = $this->readFile($tplFile);
 
         // Perform replacements
-        $contents = str_replace(
-            array_map(
-                fn (int|string $find): string => \sprintf('%s%s%s', $this->leftDelimiter, $find, $this->rightDelimiter),
-                array_keys($this->tplVars)
-            ),
-            array_values($this->tplVars),
-            $contents
-        );
+        $contents = $this->doReplacements($contents);
 
         if ($this->isUsingCache()) {
             $this->cacheItemPool->save($this->cacheItemPool->getItem($cacheKey)->set($contents));
@@ -142,7 +157,13 @@ final class Template
     }
 
     /**
+     * Refreshes the cache for a specific template file.
+     *
+     * @param string $tplFile The path to the template file.
+     *
      * @throws PsrInvalidArgumentException
+     *
+     * @return bool True if the cache was refreshed successfully, false otherwise.
      */
     public function refreshCache(string $tplFile): bool
     {
@@ -153,18 +174,32 @@ final class Template
         return $this->cacheItemPool->deleteItem(self::generateCacheKey($tplFile));
     }
 
+    /**
+     * Sets the left delimiter.
+     *
+     * @param string $delimiter The left delimiter.
+     */
     public function setLeftDelimiter(string $delimiter): void
     {
         $this->leftDelimiter = $delimiter;
     }
 
+    /**
+     * Sets the right delimiter.
+     *
+     * @param string $delimiter The right delimiter.
+     */
     public function setRightDelimiter(string $delimiter): void
     {
         $this->rightDelimiter = $delimiter;
     }
 
     /**
-     * @param array<string> $tplVars Template variables and replacements
+     * Sets the template variables.
+     *
+     * An empty array can be passed to clear/reset previously assigned variables.
+     *
+     * @param array<string> $tplVars Template variables and replacements.
      */
     public function setTplVars(array $tplVars): void
     {
@@ -177,8 +212,68 @@ final class Template
         $this->tplVars = array_merge($this->tplVars, $tplVars);
     }
 
-    private static function generateCacheKey(string $file): string
+    /**
+     * Replaces template variables in the content.
+     *
+     * @param string $contents The content of the template file.
+     *
+     * @return string The content with template variables replaced.
+     */
+    private function doReplacements(string $contents): string
+    {
+        return str_replace(
+            array_map(
+                fn (int|string $find): string => \sprintf('%s%s%s', $this->leftDelimiter, $find, $this->rightDelimiter),
+                array_keys($this->tplVars)
+            ),
+            array_values($this->tplVars),
+            $contents
+        );
+    }
+
+    /**
+     * Generates a cache key for a template file.
+     *
+     * @param string $file The path to the template file.
+     *
+     * @return string The generated cache key.
+     */
+    private function generateCacheKey(string $file): string
     {
         return \sprintf('template_%s', dechex(crc32($file)));
+    }
+
+    /**
+     * Reads the content of the template file.
+     *
+     * @param string $tplFile The path to the template file.
+     *
+     * @throws RuntimeException If the file has no valid content.
+     *
+     * @return string The content of the template file.
+     */
+    private function readFile(string $tplFile): string
+    {
+        $contents = file_get_contents($tplFile);
+
+        if ($contents === '' || $contents === false) {
+            throw new RuntimeException(\sprintf('"%s" does not appear to have any valid content.', $tplFile));
+        }
+
+        return $contents;
+    }
+
+    /**
+     * Validates the template file.
+     *
+     * @param string $tplFile The path to the template file.
+     *
+     * @throws InvalidArgumentException If the file does not exist or is not readable.
+     */
+    private function validateFile(string $tplFile): void
+    {
+        if (!is_file($tplFile) || !is_readable($tplFile)) {
+            throw new InvalidArgumentException(\sprintf('"%s" does not exist or is not a readable file.', $tplFile));
+        }
     }
 }
