@@ -195,6 +195,29 @@ final class TemplateTest extends TestCase
         $template->parse(self::$fixtureDir);
     }
 
+    public function testParseWithNoCacheProvided(): void
+    {
+        $template = new Template();
+
+        $template->setTplVars([
+            'title'   => 'Simple Template Engine Test',
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+        ]);
+
+        $data = $template->parse(self::$fixtureFiles['valid']);
+        self::assertStringEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+
+        $template->setTplVars([
+            'title'   => 'Simple Template Engine Test - Is it cached?',
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+        ]);
+
+        $data = $template->parse(self::$fixtureFiles['valid']);
+        self::assertStringNotEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+
+        self::assertTrue($template->clearCache());
+    }
+
     public function testParseWithoutTplVars(): void
     {
         $template = new Template(
@@ -212,6 +235,31 @@ final class TemplateTest extends TestCase
         $template = new Template(
             AbstractAdapter::createSystemCache('simple_tpl', 300, '', sys_get_temp_dir())
         );
+
+        $template->setTplVars([
+            'title'   => 'Simple Template Engine Test',
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+        ]);
+
+        $data = $template->parse(self::$fixtureFiles['refresh_cache']);
+        self::assertStringEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+
+        $isRefreshed = $template->refreshCache(self::$fixtureFiles['refresh_cache']);
+
+        if ($isRefreshed) {
+            $template->setTplVars([
+                'title'   => 'Simple Template Engine Test - Refresh Cache',
+                'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+            ]);
+
+            $data = $template->parse(self::$fixtureFiles['refresh_cache']);
+            self::assertStringNotEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+        }
+    }
+
+    public function testRefreshCacheNoCacheProvided(): void
+    {
+        $template = new Template();
 
         $template->setTplVars([
             'title'   => 'Simple Template Engine Test',
