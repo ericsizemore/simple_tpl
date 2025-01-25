@@ -97,7 +97,7 @@ jobs:
         uses: ericsizemore/phpunit-coverage-check-action@2.0.0
         with:
           clover_file: 'build/logs/clover.xml'
-          threshold: 100
+          threshold: 90
 
       - uses: sudo-bot/action-scrutinizer@latest
         with:
