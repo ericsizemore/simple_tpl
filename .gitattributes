@@ -7,9 +7,8 @@
 *.xml text
 
 # Ignore all test and documentation with "export-ignore".
-/.github                  export-ignore
-/examples                 export-ignore
-/tests                    export-ignore
+/.github                   export-ignore
+/tests                     export-ignore
 /.gitattributes            export-ignore
 /.gitignore                export-ignore
 /.php-cs-fixer.dist.php    export-ignore

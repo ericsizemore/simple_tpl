@@ -12,7 +12,6 @@ use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector
 return RectorConfig::configure()
     ->withParallel()
     ->withPaths([
-        __DIR__ . '/examples',
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])

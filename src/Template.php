@@ -14,11 +14,12 @@ declare(strict_types=1);
 
 namespace Esi\SimpleTpl;
 
-use InvalidArgumentException;
-use LogicException;
+use Esi\SimpleTpl\Exception\TemplateHasNoContentException;
+use Esi\SimpleTpl\Exception\TemplateNotFoundException;
+use Esi\SimpleTpl\Exception\TemplateVariablesException;
+use Esi\SimpleTpl\Storage\StorageInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
-use RuntimeException;
 
 use function array_keys;
 use function array_map;
@@ -26,7 +27,6 @@ use function array_merge;
 use function array_values;
 use function crc32;
 use function dechex;
-use function file_get_contents;
 use function str_replace;
 
 final class Template
@@ -43,7 +43,10 @@ final class Template
     /**
      * Constructor.
      */
-    public function __construct(private readonly ?CacheItemPoolInterface $cacheItemPool = null) {}
+    public function __construct(
+        private readonly StorageInterface $storage,
+        private readonly ?CacheItemPoolInterface $cacheItemPool = null
+    ) {}
 
     /**
      * Clears the cache.
@@ -114,22 +117,20 @@ final class Template
     }
 
     /**
-     * Parses the template file and replaces variables.
+     * Parses the template and replaces variables.
      *
-     * @param string $tplFile The path to the template file.
+     * @param string $templateName The name of the template.
      *
-     * @throws InvalidArgumentException    If the file cannot be found or read.
-     * @throws RuntimeException            If the file has no content.
-     * @throws LogicException              If there are no template variables set.
+     * @throws TemplateNotFoundException     If the template cannot be found or read.
+     * @throws TemplateHasNoContentException If the template has no content.
+     * @throws TemplateVariablesException    If there are no template variables set.
      * @throws PsrInvalidArgumentException
      *
      * @return string The parsed template content.
      */
-    public function parse(string $tplFile): string
+    public function parse(string $templateName): string
     {
-        $this->validateFile($tplFile);
-
-        $cacheKey = $this->generateCacheKey($tplFile);
+        $cacheKey = $this->generateCacheKey($templateName);
 
         if ($this->isUsingCache() && $this->cacheItemPool->hasItem($cacheKey)) {
             /**
@@ -140,11 +141,12 @@ final class Template
             return $templateCache;
         }
 
-        if ($this->tplVars === []) {
-            throw new LogicException('Unable to parse template, no tplVars found');
-        }
+        // Load template content
+        $contents = $this->storage->loadTemplate($templateName);
 
-        $contents = $this->readFile($tplFile);
+        if ($this->tplVars === []) {
+            throw TemplateVariablesException::create();
+        }
 
         // Perform replacements
         $contents = $this->doReplacements($contents);
@@ -171,7 +173,7 @@ final class Template
             return true;
         }
 
-        return $this->cacheItemPool->deleteItem(self::generateCacheKey($tplFile));
+        return $this->cacheItemPool->deleteItem($this->generateCacheKey($tplFile));
     }
 
     /**
@@ -241,39 +243,5 @@ final class Template
     private function generateCacheKey(string $file): string
     {
         return \sprintf('template_%s', dechex(crc32($file)));
-    }
-
-    /**
-     * Reads the content of the template file.
-     *
-     * @param string $tplFile The path to the template file.
-     *
-     * @throws RuntimeException If the file has no valid content.
-     *
-     * @return string The content of the template file.
-     */
-    private function readFile(string $tplFile): string
-    {
-        $contents = file_get_contents($tplFile);
-
-        if ($contents === '' || $contents === false) {
-            throw new RuntimeException(\sprintf('"%s" does not appear to have any valid content.', $tplFile));
-        }
-
-        return $contents;
-    }
-
-    /**
-     * Validates the template file.
-     *
-     * @param string $tplFile The path to the template file.
-     *
-     * @throws InvalidArgumentException If the file does not exist or is not readable.
-     */
-    private function validateFile(string $tplFile): void
-    {
-        if (!is_file($tplFile) || !is_readable($tplFile)) {
-            throw new InvalidArgumentException(\sprintf('"%s" does not exist or is not a readable file.', $tplFile));
-        }
     }
 }

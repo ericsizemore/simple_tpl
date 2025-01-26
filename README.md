@@ -12,15 +12,13 @@
 <!-- Remove until 3.x release
 [![License](https://img.shields.io/packagist/l/esi/simple_tpl.svg)](https://packagist.org/packages/esi/simple_tpl)
 -->
+
 [Simple Template Engine](http://github.com/ericsizemore/simple_tpl/) is a small, simple text-based template parsing engine that works on text replacement.
 
 > [!IMPORTANT]
-> The `master` branch currently holds the work in progress version `3.x`, which is a break from the backward compatibility promise. This will be resolved once 3.0.0 is released. 
-> Since `3.x` is under development, it is not recommended to use in a production environment. The public api, implementations, etc. can (and will likely) change.
-
-> [!IMPORTANT]
-> The `3.x` branch is mostly an introduction of caching templates. As this is in development, I'm playing around with a few different ideas. For example, right now it just caches
-> the entire template after it has been parsed (so it caches template + content). This can and will likely change as I continue testing out different approaches.
+> The `master` branch currently holds the work-in-progress version `3.x`, which is a break from the backward compatibility promise.
+> This will be resolved once `3.0.0` is released. Since `3.x` is under development, it is not recommended to use in a production environment.
+> The public API, implementations, etc., can (and will likely) change.
 
 ---
 
@@ -29,29 +27,110 @@
 Compatible with PHP >= 8.2 and can be installed with [Composer](https://getcomposer.org).
 
 ```bash
-$ composer require esi/simple_tpl
+$ composer require esi/simple_tpl:^3.0
 ```
 
-### Usage
+## Usage
 
-Basic usage, without providing a cache library:
+### Storage
+
+There are two storage implementations available: `Storage\FilesystemStorage` and `Storage\DatabaseStorage`.
+Both storage implementations implement the `Storage\StorageInterface` interface, with only one defined method: `loadTemplate()`.
+
+**NOTE:** If you wish to have a system for deleting or updating the templates themselves, you would need to implement this on your own.
+This library only searches for templates that have already been created, by name, then parses them with a `key => value` associative array of variables.
+
+#### Filesystem Storage
+
+The `FilesystemStorage` implementation allows you to use regular files for your templates.
+Your template files are expected to end with the `.tpl` extension. I plan to allow the ability to use different extensions later.
+
+1. Create a `FilesystemStorage` instance with the path/directory to where your templates are located.
+2. Pass this instance to the `Template` class when creating it.
+
+Let's say you had a template called `example_template.tpl` within the `./templates/` directory.
+
+Template file:
+```html
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html" />
+    <title>{title}</title>
+</head>
+<body>
+<p>{content}</p>
+</body>
+</html>
+```
+
+PHP to parse the template:
+```php
+use Esi\SimpleTpl\Template;
+use Esi\SimpleTpl\Storage\FilesystemStorage;
+
+$templateStorage = new FilesystemStorage('./templates/');
+$template = new Template($templateStorage);
+
+$template->setTplVars([
+    'title' => 'Hello, World!',
+    'content' => 'This is a simple template engine.'
+]);
+
+echo $template->parse('example_template');
+```
+
+When calling `display()` or `parse()`, you only need to provide the file name without extension.
+For example, if your template file is `mytemplate.tpl`, you would call either of these methods with `mytemplate`.
+
+#### Database Storage
+
+The `DatabaseStorage` implementation allows you to use a database for your templates.
+
+1. Create a `PDO` instance with your database details to create a connection.
+2. Create a `DatabaseStorage` instance and pass the `PDO` instance to it.
+3. Pass the `DatabaseStorage` instance to the `Template` class when creating it.
+
+Let's say the content of the `example_template` is the same as in the [filesystem example](#filesystem-storage):
 
 ```php
 use Esi\SimpleTpl\Template;
+use Esi\SimpleTpl\Storage\DatabaseTemplateStorage;
+use PDO;
 
-$tpl = new Template();
+$pdo = new PDO('mysql:host=localhost;dbname=templates', 'user', 'password');
+$templateStorage = new DatabaseTemplateStorage($pdo);
+$template = new Template($templateStorage);
 
-$tpl->setTplVars([
-    'title'   => 'Simple Template Engine Test',
-    'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+$template->setTplVars([
+    'title' => 'Hello, World!',
+    'content' => 'This is a simple template engine.'
 ]);
 
-// Parse the template file
-$tpl->display(__DIR__ . '/some_template.tpl');
+echo $template->parse('example_template');
 ```
+
+`DatabaseStorage` does not allow specifying custom table or field/column names. It expects a table named `templates` with, at minimum, two columns
+named `name` (for the template name) and `content` (for the template content). I plan to allow the ability to use custom table and field/column names later.
+
+An example on how this table may be structured:
+
+```sql
+CREATE TABLE IF NOT EXISTS `templates` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `content` MEDIUMTEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `name` (`name`)
+)
+```
+
+### Caching
 
 If you would like to utilize caching for templates, you will need to provide the library a [PSR-6](https://www.php-fig.org/psr/psr-6/) cache implementation.
 You can view a list of packages that provide this implementation on [Packagist](https://packagist.org/providers/psr/cache-implementation).
+
+Whether you use `FilesystemStorage` or `DatabaseStorage`, you can use caching for either by passing an object that implements `\Psr\Cache\CacheItemPoolInterface`.
 
 For example:
 
@@ -61,9 +140,12 @@ $ composer require symfony/cache:^7.2
 
 ```php
 use Esi\SimpleTpl\Template;
+use Esi\SimpleTpl\Storage\FilesystemStorage;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
-$tpl = new Template(
+$templateStorage = new FilesystemStorage('/path/to/templates');
+$template = new Template(
+    $templateStorage,
     /**
      * Symfony's AbstractAdapter::createSystemCache() returns the best possible adapter that your runtime supports.
      * Generally, it will create a cache via PHP files (Opcache must be enabled via opcache.enable in php.ini), and chain that with APCu if your system supports it.
@@ -76,8 +158,6 @@ $tpl = new Template(
 
 // ... assign vars, parse /display template, etc ...
 ```
-
-Some basic examples have also been provided within the [`examples`](./examples) folder.
 
 ## About
 

@@ -39,7 +39,11 @@
         "psalm/plugin-phpunit": "^0.19.0",
         "rector/rector": "^2.0",
         "symfony/cache": "^7.2",
-        "vimeo/psalm": "dev-master"
+        "vimeo/psalm": "^6.0",
+        "ext-pdo": "*"
+    },
+    "suggest": {
+        "ext-pdo": "To use the DatabaseStorage option."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

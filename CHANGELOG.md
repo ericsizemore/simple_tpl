@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Psalm
     * RectorPHP
   * Added template caching via `PSR-6` support.
+  * Added support for filesystem storage and database storage of templates.
+    * Adds: `Storage\FilesystemStorage`, `Storage\DatabaseStorage`, and `Storage\StorageInterface`.
+  * Added library specific exceptions:
+    * `Exception\TemplateHasNoContentException`
+    * `Exception\TemplateNotFoundException`
+    * `Exception\TemplateVariablesException`
 
 ### Changed
 
@@ -27,6 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Bumped minimum PHP version requirement to 8.2
   * Updated header docblock in each source file to be more compact.
   * Updated with new coding standards and fixes to issues reported by Psalm.
+  * Updated the `README.md` file to be more thorough.
+  * Changed the exceptions thrown in various situations:
+    * Instead of `InvalidArgumentException` when a template isn't found, `Exception\TemplateNotFoundException` is thrown instead.
+    * Instead of `LogicException` when no template variables are set, `Exception\TemplateVariablesException` is thrown instead.
+    * Instead of `RuntimeException` when a template does not return content, `Exception\TemplateHasNoContentException` is thrown instead.
+
+### Removed
+
+  * Removed the `examples` directory and files, and added examples directly to the `README`.
 
 
 ## [2.0.1] - 2023-12-20
