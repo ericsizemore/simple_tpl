@@ -37,7 +37,7 @@ $ composer require esi/simple_tpl:^3.0
 There are two storage implementations available: `Storage\FilesystemStorage` and `Storage\DatabaseStorage`.
 Both storage implementations implement the `Storage\StorageInterface` interface, with only one defined method: `loadTemplate()`.
 
-**NOTE:** If you wish to have a system for deleting or updating the templates themselves, you would need to implement this on your own.
+**NOTE:** If you wish to have a system for editing/saving, deleting or updating the templates themselves, you would need to implement this on your own.
 This library only searches for templates that have already been created, by name, then parses them with a `key => value` associative array of variables.
 
 #### Filesystem Storage

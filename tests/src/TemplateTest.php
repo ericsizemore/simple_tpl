@@ -291,6 +291,27 @@ final class TemplateTest extends TestCase
         $template->parse(self::$fixtureDir);
     }
 
+    public function testParseWithMethodChaining(): void
+    {
+        $template = new Template(
+            new FilesystemStorage(self::$fixtureDir),
+        );
+
+        $data = $template->setTplVars([
+            'title'   => 'Simple Template Engine Test',
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+        ])->parse('valid');
+        self::assertStringEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+
+        $data = $template->setTplVars([
+            'title'   => 'Simple Template Engine Test - Is it cached?',
+            'content' => 'This is a test of the Simple Template Engine class by Eric Sizemore.',
+        ])->parse('valid');
+        self::assertStringNotEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+
+        self::assertTrue($template->clearCache());
+    }
+
     public function testParseWithNoCacheProvided(): void
     {
         $template = new Template(

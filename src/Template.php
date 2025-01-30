@@ -65,13 +65,13 @@ final class Template
     /**
      * Displays the parsed template.
      *
-     * @param string $tplFile The path to the template file.
+     * @param string $templateName The path to the template file.
      *
      * @throws PsrInvalidArgumentException
      */
-    public function display(string $tplFile): void
+    public function display(string $templateName): void
     {
-        echo $this->parse($tplFile);
+        echo $this->parse($templateName);
     }
 
     /**
@@ -161,19 +161,19 @@ final class Template
     /**
      * Refreshes the cache for a specific template file.
      *
-     * @param string $tplFile The path to the template file.
+     * @param string $templateName The path to the template file.
      *
      * @throws PsrInvalidArgumentException
      *
      * @return bool True if the cache was refreshed successfully, false otherwise.
      */
-    public function refreshCache(string $tplFile): bool
+    public function refreshCache(string $templateName): bool
     {
         if (!$this->isUsingCache()) {
             return true;
         }
 
-        return $this->cacheItemPool->deleteItem($this->generateCacheKey($tplFile));
+        return $this->cacheItemPool->deleteItem($this->generateCacheKey($templateName));
     }
 
     /**
@@ -181,9 +181,11 @@ final class Template
      *
      * @param string $delimiter The left delimiter.
      */
-    public function setLeftDelimiter(string $delimiter): void
+    public function setLeftDelimiter(string $delimiter): self
     {
         $this->leftDelimiter = $delimiter;
+
+        return $this;
     }
 
     /**
@@ -191,9 +193,11 @@ final class Template
      *
      * @param string $delimiter The right delimiter.
      */
-    public function setRightDelimiter(string $delimiter): void
+    public function setRightDelimiter(string $delimiter): self
     {
         $this->rightDelimiter = $delimiter;
+
+        return $this;
     }
 
     /**
@@ -203,15 +207,11 @@ final class Template
      *
      * @param array<string> $tplVars Template variables and replacements.
      */
-    public function setTplVars(array $tplVars): void
+    public function setTplVars(array $tplVars): self
     {
-        if ($tplVars === []) {
-            $this->tplVars = [];
+        $this->tplVars = ($tplVars === []) ? [] : array_merge($this->tplVars, $tplVars);
 
-            return;
-        }
-
-        $this->tplVars = array_merge($this->tplVars, $tplVars);
+        return $this;
     }
 
     /**
@@ -234,14 +234,14 @@ final class Template
     }
 
     /**
-     * Generates a cache key for a template file.
+     * Generates a cache key for a template.
      *
-     * @param string $file The path to the template file.
+     * @param string $templateName The name of the template.
      *
      * @return string The generated cache key.
      */
-    private function generateCacheKey(string $file): string
+    private function generateCacheKey(string $templateName): string
     {
-        return \sprintf('template_%s', dechex(crc32($file)));
+        return \sprintf('template_%s', dechex(crc32($templateName)));
     }
 }

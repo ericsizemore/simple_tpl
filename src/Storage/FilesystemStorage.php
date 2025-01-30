@@ -16,7 +16,6 @@ namespace Esi\SimpleTpl\Storage;
 
 use Esi\SimpleTpl\Exception\TemplateHasNoContentException;
 use Esi\SimpleTpl\Exception\TemplateNotFoundException;
-use InvalidArgumentException;
 
 use function file_get_contents;
 use function is_file;
@@ -25,10 +24,25 @@ use function rtrim;
 
 use const DIRECTORY_SEPARATOR;
 
-class FilesystemStorage implements StorageInterface
+readonly class FilesystemStorage implements StorageInterface
 {
-    private readonly string $templateDir;
+    /**
+     * The format used by {@see getTemplatePath()}.
+     *
+     * @const string
+     */
+    private const TemplatePathString = '%s%s.tpl';
 
+    /**
+     * The directory/folder containing template files.
+     */
+    private string $templateDir;
+
+    /**
+     * Constructor.
+     *
+     * @param string $templateDir The directory/folder containing template files.
+     */
     public function __construct(string $templateDir)
     {
         $this->templateDir = rtrim($templateDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -40,9 +54,19 @@ class FilesystemStorage implements StorageInterface
     #[\Override]
     public function loadTemplate(string $templateName): string
     {
-        $templatePath = \sprintf('%s%s.tpl', $this->templateDir, $templateName);
+        return $this->readFile($this->getTemplatePath($templateName));
+    }
 
-        return $this->readFile($templatePath);
+    /**
+     * Builds the full path to a given template.
+     *
+     * @param string $templateName The name of the template.
+     *
+     * @return string The full path to the template.
+     */
+    private function getTemplatePath(string $templateName): string
+    {
+        return \sprintf(self::TemplatePathString, $this->templateDir, $templateName);
     }
 
     /**
@@ -51,10 +75,11 @@ class FilesystemStorage implements StorageInterface
      * @param string $templatePath The path to the template file.
      *
      * @throws TemplateHasNoContentException If the file has no valid content.
+     * @throws TemplateNotFoundException     If the file does not exist or is not readable.
      *
      * @return string The content of the template file.
      */
-    protected function readFile(string $templatePath): string
+    private function readFile(string $templatePath): string
     {
         $this->validateFile($templatePath);
 
@@ -72,9 +97,9 @@ class FilesystemStorage implements StorageInterface
      *
      * @param string $templatePath The path to the template file.
      *
-     * @throws InvalidArgumentException If the file does not exist or is not readable.
+     * @throws TemplateNotFoundException If the file does not exist or is not readable.
      */
-    protected function validateFile(string $templatePath): void
+    private function validateFile(string $templatePath): void
     {
         if (!is_file($templatePath) || !is_readable($templatePath)) {
             throw TemplateNotFoundException::forFilesystemTemplate($templatePath);

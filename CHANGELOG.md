@@ -38,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     * Instead of `InvalidArgumentException` when a template isn't found, `Exception\TemplateNotFoundException` is thrown instead.
     * Instead of `LogicException` when no template variables are set, `Exception\TemplateVariablesException` is thrown instead.
     * Instead of `RuntimeException` when a template does not return content, `Exception\TemplateHasNoContentException` is thrown instead.
+  * `setLeftDelimiter()`, `setRightDelimiter()`, and `setTplVars()` no longer have a return type of `void`.
+    * They now return the class instance to allow for method chaining. 
 
 ### Removed
 
