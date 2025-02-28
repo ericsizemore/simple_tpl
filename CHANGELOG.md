@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-  * Added issue templates and a pull request template.
+  * Added issue templates, and a pull request template.
   * Added a Contributor Code of Conduct.
   * Added new contributing information in `CONTRIBUTING`.
   * Added a Backward Compatibility promise.

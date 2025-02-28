@@ -16,7 +16,7 @@ namespace Esi\SimpleTpl\Exception;
 
 use LogicException;
 
-class TemplateVariablesException extends LogicException
+final class TemplateVariablesException extends LogicException
 {
     public static function create(): self
     {

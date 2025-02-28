@@ -18,6 +18,7 @@ use Esi\SimpleTpl\Exception\TemplateHasNoContentException;
 use Esi\SimpleTpl\Exception\TemplateNotFoundException;
 use Esi\SimpleTpl\Exception\TemplateVariablesException;
 use Esi\SimpleTpl\Storage\DatabaseStorage;
+use Esi\SimpleTpl\Storage\DatabaseStorageConfig;
 use Esi\SimpleTpl\Storage\FilesystemStorage;
 use Esi\SimpleTpl\Template;
 use PDO;
@@ -38,6 +39,7 @@ use function sys_get_temp_dir;
  */
 #[CoversClass(Template::class)]
 #[CoversClass(DatabaseStorage::class)]
+#[CoversClass(DatabaseStorageConfig::class)]
 #[CoversClass(FilesystemStorage::class)]
 #[CoversClass(TemplateHasNoContentException::class)]
 #[CoversClass(TemplateNotFoundException::class)]
@@ -51,6 +53,7 @@ final class TemplateTest extends TestCase
      */
     private static array $fixtureFiles;
 
+    #[\Override]
     public static function setUpBeforeClass(): void
     {
         self::$fixtureDir   = \dirname(__DIR__) . \DIRECTORY_SEPARATOR . 'fixtures';
@@ -64,6 +67,7 @@ final class TemplateTest extends TestCase
         ];
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         self::$fixtureDir   = '';
@@ -74,7 +78,7 @@ final class TemplateTest extends TestCase
     {
         $pdo             = $this->createMock(PDO::class);
         $stmt            = $this->createMock(PDOStatement::class);
-        $databaseStorage = new DatabaseStorage($pdo);
+        $databaseStorage = new DatabaseStorage($pdo, new DatabaseStorageConfig());
 
         $templateName    = 'test_template';
         $templateContent = 'This is a test template content.';
@@ -101,7 +105,7 @@ final class TemplateTest extends TestCase
     {
         $pdo             = $this->createMock(PDO::class);
         $stmt            = $this->createMock(PDOStatement::class);
-        $databaseStorage = new DatabaseStorage($pdo);
+        $databaseStorage = new DatabaseStorage($pdo, new DatabaseStorageConfig());
 
         $templateName = 'non_existent_template';
 
@@ -128,7 +132,7 @@ final class TemplateTest extends TestCase
     {
         $pdo             = $this->createMock(PDO::class);
         $stmt            = $this->createMock(PDOStatement::class);
-        $databaseStorage = new DatabaseStorage($pdo);
+        $databaseStorage = new DatabaseStorage($pdo, new DatabaseStorageConfig());
 
         $templateName = 'non_existent_template';
 
@@ -169,6 +173,23 @@ final class TemplateTest extends TestCase
 
         self::assertIsString($data);
         self::assertStringEqualsFile(self::$fixtureFiles['valid_parsed'], $data);
+    }
+
+    public function testGetSchemaReturnsDefault(): void
+    {
+        $databaseStorageConfig = new DatabaseStorageConfig();
+
+        $expected = \sprintf(<<<'SQL'
+            CREATE TABLE IF NOT EXISTS `%1$s` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `%2$s` VARCHAR(255) NOT NULL,
+                `%3$s` MEDIUMTEXT NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `%2$s` (`%2$s`)
+            )
+            SQL, $databaseStorageConfig->tableName, $databaseStorageConfig->nameField, $databaseStorageConfig->contentField);
+
+        self::assertSame($expected, $databaseStorageConfig->getSchema());
     }
 
     public function testGetTplVars(): void
@@ -460,5 +481,14 @@ final class TemplateTest extends TestCase
 
         $template->setTplVars([]);
         self::assertSame([], $template->getTplVars());
+    }
+
+    public function testVerifyConfigRevertsToDefaults(): void
+    {
+        $databaseStorageConfig = new DatabaseStorageConfig('', ' ', '');
+
+        self::assertSame('templates', $databaseStorageConfig->tableName);
+        self::assertSame('name', $databaseStorageConfig->nameField);
+        self::assertSame('content', $databaseStorageConfig->contentField);
     }
 }

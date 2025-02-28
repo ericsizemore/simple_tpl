@@ -16,7 +16,7 @@ namespace Esi\SimpleTpl\Exception;
 
 use RuntimeException;
 
-class TemplateHasNoContentException extends RuntimeException
+final class TemplateHasNoContentException extends RuntimeException
 {
     public static function create(string $templatePath): self
     {

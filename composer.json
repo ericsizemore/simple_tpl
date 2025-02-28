@@ -27,20 +27,20 @@
         "psr/cache": "^2.0 || ^3.0"
     },
     "require-dev": {
-        "esi/phpunit-coverage-check": "^2.0",
-        "friendsofphp/php-cs-fixer": "^3.68",
+        "ext-pdo": "*",
+        "esi/phpunit-coverage-check": "^2.0 || ^3.0",
+        "friendsofphp/php-cs-fixer": "^3.70",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "^11.5",
+        "phpunit/phpunit": "^11.5 || ^12.0",
         "psalm/plugin-phpunit": "^0.19.0",
         "rector/rector": "^2.0",
         "symfony/cache": "^7.2",
-        "vimeo/psalm": "^6.1",
-        "ext-pdo": "*"
+        "vimeo/psalm": "^6.8"
     },
     "suggest": {
         "ext-pdo": "To use the DatabaseStorage option."

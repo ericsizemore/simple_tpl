@@ -3,7 +3,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/build.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ericsizemore/simple_tpl/?branch=master)
-[![Continuous Integration](https://github.com/ericsizemore/mimey/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/ericsizemore/mimey/actions/workflows/continuous-integration.yml)
+[![Continuous Integration](https://github.com/ericsizemore/simple_tpl/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/ericsizemore/simple_tpl/actions/workflows/continuous-integration.yml)
 [![Type Coverage](https://shepherd.dev/github/ericsizemore/simple_tpl/coverage.svg)](https://shepherd.dev/github/ericsizemore/simple_tpl)
 [![Psalm Level](https://shepherd.dev/github/ericsizemore/simple_tpl/level.svg)](https://shepherd.dev/github/ericsizemore/simple_tpl)
 [![Latest Stable Version](https://img.shields.io/packagist/v/esi/simple_tpl.svg?label=stable)](https://packagist.org/packages/esi/simple_tpl)
@@ -88,32 +88,12 @@ For example, if your template file is `mytemplate.tpl`, you would call either of
 The `DatabaseStorage` implementation allows you to use a database for your templates.
 
 1. Create a `PDO` instance with your database details to create a connection.
-2. Create a `DatabaseStorage` instance and pass the `PDO` instance to it.
-3. Pass the `DatabaseStorage` instance to the `Template` class when creating it.
+2. Create a `DatabaseStorageConfig` with your template tables `tableName`, `nameField`, and `contentField`.
+3. Create a `DatabaseStorage` instance and pass the `PDO` and `DatabaseStorageConfig` instances to it.
+4. Pass the `DatabaseStorage` instance to the `Template` class when creating it.
 
-Let's say the content of the `example_template` is the same as in the [filesystem example](#filesystem-storage):
-
-```php
-use Esi\SimpleTpl\Template;
-use Esi\SimpleTpl\Storage\DatabaseTemplateStorage;
-use PDO;
-
-$pdo = new PDO('mysql:host=localhost;dbname=templates', 'user', 'password');
-$templateStorage = new DatabaseTemplateStorage($pdo);
-$template = new Template($templateStorage);
-
-$template->setTplVars([
-    'title' => 'Hello, World!',
-    'content' => 'This is a simple template engine.'
-]);
-
-echo $template->parse('example_template');
-```
-
-`DatabaseStorage` does not allow specifying custom table or field/column names. It expects a table named `templates` with, at minimum, two columns
-named `name` (for the template name) and `content` (for the template content). I plan to allow the ability to use custom table and field/column names later.
-
-An example on how this table may be structured:
+Let's say the content of the `example_template` is the same as in the [filesystem example](#filesystem-storage), and your
+database table structure is:
 
 ```sql
 CREATE TABLE IF NOT EXISTS `templates` (
@@ -123,6 +103,27 @@ CREATE TABLE IF NOT EXISTS `templates` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`)
 )
+```
+
+Then your code would look something like:
+
+```php
+use Esi\SimpleTpl\Template;
+use Esi\SimpleTpl\Storage\DatabaseStorage;
+use Esi\SimpleTpl\Storage\DatabaseStorageConfig;
+use PDO;
+
+$pdo = new PDO('mysql:host=localhost;dbname=templates', 'user', 'password');
+$storageConfig = new DatabaseStorageConfig(); // with the example table structure above, the config defaults to 'templates', 'name', 'content'
+$templateStorage = new DatabaseTemplateStorage($pdo, $storageConfig);
+$template = new Template($templateStorage);
+
+$template->setTplVars([
+    'title' => 'Hello, World!',
+    'content' => 'This is a simple template engine.'
+]);
+
+echo $template->parse('example_template');
 ```
 
 ### Caching

@@ -18,9 +18,9 @@ use Esi\SimpleTpl\Exception\TemplateHasNoContentException;
 use Esi\SimpleTpl\Exception\TemplateNotFoundException;
 use PDO;
 
-readonly class DatabaseStorage implements StorageInterface
+final readonly class DatabaseStorage implements StorageInterface
 {
-    public function __construct(private PDO $pdo) {}
+    public function __construct(private PDO $pdo, private DatabaseStorageConfig $databaseStorageConfig) {}
 
     /**
      * @inheritDoc
@@ -28,7 +28,14 @@ readonly class DatabaseStorage implements StorageInterface
     #[\Override]
     public function loadTemplate(string $templateName): string
     {
-        $stmt = $this->pdo->prepare('SELECT content FROM templates WHERE name = :name');
+        $stmt = $this->pdo->prepare(
+            \sprintf(
+                'SELECT %s FROM %s WHERE %s = :name',
+                $this->databaseStorageConfig->contentField,
+                $this->databaseStorageConfig->tableName,
+                $this->databaseStorageConfig->nameField
+            )
+        );
 
         $stmt->execute(['name' => $templateName]);
 

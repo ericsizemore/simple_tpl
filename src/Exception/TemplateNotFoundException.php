@@ -16,7 +16,7 @@ namespace Esi\SimpleTpl\Exception;
 
 use InvalidArgumentException;
 
-class TemplateNotFoundException extends InvalidArgumentException
+final class TemplateNotFoundException extends InvalidArgumentException
 {
     public static function forDatabaseTemplate(string $templateName): self
     {

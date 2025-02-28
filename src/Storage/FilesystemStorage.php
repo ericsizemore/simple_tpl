@@ -24,7 +24,7 @@ use function rtrim;
 
 use const DIRECTORY_SEPARATOR;
 
-readonly class FilesystemStorage implements StorageInterface
+final readonly class FilesystemStorage implements StorageInterface
 {
     /**
      * The format used by {@see getTemplatePath()}.
