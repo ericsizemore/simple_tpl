@@ -170,7 +170,6 @@ $template = new Template(
 
 - Author: [Eric Sizemore](https://github.com/ericsizemore)
 - Thanks to [all Contributors](https://github.com/ericsizemore/simple_tpl/contributors).
-- Special thanks to [JetBrains](https://www.jetbrains.com/?from=esi-simpple-tpl) for their Licenses for Open Source Development.
 
 ## Contributing
 
