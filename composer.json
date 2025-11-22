@@ -23,7 +23,7 @@
         "security": "https://github.com/ericsizemore/simple_tpl/security/policy"
     },
     "require": {
-        "php": "^8.2 <8.5",
+        "php": "<8.6",
         "psr/cache": "^2.0 || ^3.0"
     },
     "require-dev": {
