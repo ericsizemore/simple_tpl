@@ -23,24 +23,24 @@
         "security": "https://github.com/ericsizemore/simple_tpl/security/policy"
     },
     "require": {
-        "php": "^8.2 <8.5",
+        "php": ">=8.2",
         "psr/cache": "^2.0 || ^3.0"
     },
     "require-dev": {
         "ext-pdo": "*",
-        "esi/phpunit-coverage-check": "^2.0",
-        "friendsofphp/php-cs-fixer": "^3.89",
+        "esi/phpunit-coverage-check": "^2.0 || ^3.1",
+        "friendsofphp/php-cs-fixer": "^3.94",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "^11.5",
+        "phpunit/phpunit": "^11.5 || ^12.5 || ^13",
         "psalm/plugin-phpunit": "^0.19",
-        "rector/rector": "^2.2",
-        "symfony/cache": "^7.3",
-        "vimeo/psalm": "^6.13"
+        "rector/rector": "^2.3",
+        "symfony/cache": "^7.4 || ^8.0",
+        "vimeo/psalm": "^6.15"
     },
     "suggest": {
         "ext-pdo": "To use the DatabaseStorage option."
@@ -86,10 +86,11 @@
         "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon -vvv",
         "phpunit": "vendor/bin/phpunit",
         "phpunit:migrate": "@phpunit --migrate-configuration",
-        "psalm": "vendor/bin/psalm -c psalm.xml --no-cache --no-diff",
-        "psalm:baseline": "vendor/bin/psalm -c psalm.xml --no-cache --no-diff --set-baseline=psalm-baseline.xml",
-        "psalm:security": "vendor/bin/psalm -c psalm.xml --no-cache --no-diff --taint-analysis",
-        "psalm:shepherd": "@psalm --shepherd --stats",
+        "psalm": "vendor/bin/psalm -c psalm.xml --no-cache",
+        "psalm:baseline": "@psalm --no-diff --set-baseline=psalm-baseline.xml",
+        "psalm:ci": "@psalm:security --shepherd --report=results.sarif",
+        "psalm:security": "@psalm --no-diff --taint-analysis",
+        "psalm:shepherd": "@psalm --no-diff --shepherd --stats",
         "refactor:check": "@refactor:fix --dry-run",
         "refactor:fix": "vendor/bin/rector process"
     }
